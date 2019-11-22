@@ -116,9 +116,9 @@ export default {
   methods: {
     async getWalletDetail() {
       let res = await getTradeAndBlanceByAddress(this.address);
+      console.log(res);
       this.blance = res.blance;
       this.tradeList = res.trade;
-      console.log(res);
     },
     rowStyle({ row, rowIndex }) {
       if (rowIndex % 2 === 0) {

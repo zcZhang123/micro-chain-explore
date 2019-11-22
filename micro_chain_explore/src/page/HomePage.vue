@@ -29,7 +29,7 @@ export default {
 <style  lang="scss" scoped>
 .home-header {
   width: 100%;
-  height: 150px;
+  height: 80px;
 }
 .home-search {
   float: right;

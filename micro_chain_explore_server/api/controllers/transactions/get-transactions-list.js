@@ -33,7 +33,7 @@ module.exports = {
         .skip(page * seq).limit(seq)
       count = await Transactions.count();
     }
-    return { data: transactionsList, count: count };
+    return Utils._return(ResultCode.OK_GET_TRADE_LIST, { data: transactionsList, count: count });
 
   }
 

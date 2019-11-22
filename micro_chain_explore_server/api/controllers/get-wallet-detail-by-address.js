@@ -22,7 +22,7 @@ module.exports = {
       let fromTradeList = await Transactions.find({ from: address })
       let toTradeList = await Transactions.find({ to: address })
       trade = fromTradeList.concat(toTradeList)
-      return { blance: blance, trade: trade }
+      return Utils._return(ResultCode.OK_GET_WALLET_DETAIL, { blance: blance, trade: trade })
     } catch (error) {
       return error
     }

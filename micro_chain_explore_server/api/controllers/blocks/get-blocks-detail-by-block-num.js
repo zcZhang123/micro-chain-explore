@@ -17,7 +17,7 @@ module.exports = {
     try {
       let detail = await Blocks.findOne({ block_number: blockNum })
       let tradeList = await Transactions.find({ block_num: blockNum })
-      return { detail: detail, tradeList: tradeList };
+      return Utils._return(ResultCode.OK_GET_BLOCKS_DETAIL, { detail: detail, tradeList: tradeList });
     } catch (error) {
       return error
     }

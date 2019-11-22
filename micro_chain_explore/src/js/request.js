@@ -9,7 +9,9 @@ import api from './api'
 export const getBlocksList = async (isLatest, page, seq) => {
     try {
         let res = await api.get_blocks_list(isLatest, page, seq);
-        return res
+        if (res.code === '0') {
+            return res.data
+        }
     } catch (error) {
         return error
     }
@@ -24,7 +26,9 @@ export const getBlocksList = async (isLatest, page, seq) => {
 export const getTransactionsList = async (isLatest, page, seq) => {
     try {
         let res = await api.get_transactions_list(isLatest, page, seq);
-        return res
+        if (res.code === '0') {
+            return res.data
+        }
     } catch (error) {
         return error
     }
@@ -37,7 +41,9 @@ export const getTransactionsList = async (isLatest, page, seq) => {
 export const getBlockDetailByHash = async (hash) => {
     try {
         let res = await api.get_block_detail_by_hash(hash);
-        return res
+        if (res.code === '0') {
+            return res.data
+        }
     } catch (error) {
         return error
     }
@@ -50,7 +56,9 @@ export const getBlockDetailByHash = async (hash) => {
 export const getBlockDetailByBlockNum = async (blockNum) => {
     try {
         let res = await api.get_block_detail_by_block_num(blockNum);
-        return res
+        if (res.code === '0') {
+            return res.data
+        }
     } catch (error) {
         return error
     }
@@ -63,7 +71,9 @@ export const getBlockDetailByBlockNum = async (blockNum) => {
 export const getTradeDetailByHash = async (hash) => {
     try {
         let res = await api.get_trade_detail_by_hash(hash);
-        return res;
+        if (res.code === '0') {
+            return res.data
+        }
     } catch (error) {
         return error
     }
@@ -76,7 +86,9 @@ export const getTradeDetailByHash = async (hash) => {
 export const getHashType = async (hash) => {
     try {
         let res = await api.get_hash_type(hash);
-        return res
+        if (res.code === '0') {
+            return res.data.type
+        }
     } catch (error) {
         return error
     }
@@ -89,7 +101,9 @@ export const getHashType = async (hash) => {
 export const getTradeAndBlanceByAddress = async (address) => {
     try {
         let res = await api.get_trade_adn_blance_by_address(address);
-        return res
+        if (res.code === '0') {
+            return res.data
+        }
     } catch (error) {
         return error
     }
@@ -101,7 +115,9 @@ export const getTradeAndBlanceByAddress = async (address) => {
 export const getMicroChainInfo = async () => {
     try {
         let res = await api.get_micro_chain_info();
-        return res
+        if (res.code === '0') {
+            return res.data
+        }
     } catch (error) {
         return error
     }

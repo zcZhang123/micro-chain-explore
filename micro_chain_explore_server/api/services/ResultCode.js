@@ -17,14 +17,16 @@ module.exports = {
     },
     OK_GET_HASH_TYPE: {
         code: '0',
-        MSG: '获取哈希类型成功'
+        msg: '获取哈希类型成功'
     },
     OK_GET_MICRO_CHAIN_INFO: {
         code: '0',
         msg: '获取子链信息成功'
     },
-
-    
+    OK_GET_WALLET_DETAIL: {
+        code: '0',
+        msg: '获取钱包详情成功'
+    },
     ERR_SYSTEM_DB: {
         code: '9999',
         msg: '网络错误，请稍后重试'

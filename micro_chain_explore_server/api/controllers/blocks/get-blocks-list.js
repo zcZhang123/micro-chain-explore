@@ -34,7 +34,7 @@ module.exports = {
           .skip(page * seq).limit(seq)
         count = await Blocks.count()
       }
-      return { data: blocksList, count: count };
+      return Utils._return(ResultCode.OK_GET_BLOCKS_LIST, { data: blocksList, count: count });
     } catch (error) {
       return error
     }

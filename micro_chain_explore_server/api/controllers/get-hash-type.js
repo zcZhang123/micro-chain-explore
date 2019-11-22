@@ -27,7 +27,7 @@ module.exports = {
           type = 2
         }
       }
-      return type
+      return Utils._return(ResultCode.OK_GET_HASH_TYPE, { type: type })
     } catch (error) {
       return error
     }
