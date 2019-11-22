@@ -30,7 +30,7 @@ module.exports = {
     } else {
       transactionsList = await Transactions.find()
         .sort('createdAt DESC')
-        .skip(page * seq).limit(seq)
+        .skip((page - 1) * seq).limit(seq)
       count = await Transactions.count();
     }
     return Utils._return(ResultCode.OK_GET_TRADE_LIST, { data: transactionsList, count: count });

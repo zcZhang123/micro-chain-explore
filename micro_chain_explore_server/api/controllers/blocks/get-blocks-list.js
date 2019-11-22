@@ -8,7 +8,7 @@ module.exports = {
     isLatest: {// 查询首页区块数据，true:返回最新6条数据
       type: 'boolean'
     },
-    page: { // isLatest为false时生效,当前页数,从0开始
+    page: { // isLatest为false时生效,当前页数
       type: 'number'
     },
     seq: { // isLatest为false时生效,每页显示多少条
@@ -31,7 +31,7 @@ module.exports = {
       } else {
         blocksList = await Blocks.find()
           .sort('block_number DESC')
-          .skip(page * seq).limit(seq)
+          .skip((page - 1) * seq).limit(seq)
         count = await Blocks.count()
       }
       return Utils._return(ResultCode.OK_GET_BLOCKS_LIST, { data: blocksList, count: count });

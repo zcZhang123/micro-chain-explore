@@ -106,7 +106,7 @@ export default {
     return {
       blocksList: [],
       loading: false,
-      currentPage: 0, // 当前页
+      currentPage: 1, // 当前页
       defaultPageSize: 20, // 每页展示条数
       total: 0 // 总条数
     };

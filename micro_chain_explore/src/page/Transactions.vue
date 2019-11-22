@@ -64,26 +64,40 @@
         </div>
       </div>
     </div>
+    <Pagination
+      :defaultPageSize="defaultPageSize"
+      :total="total"
+      :currentPage="currentPage"
+      @changeSize="changeDefaultSize"
+      @changCurrentPage="changCurrentPage"
+    ></Pagination>
   </div>
 </template>
 <script>
 import Header from "../components/Header";
+import Pagination from "../components/Pagination";
 import { getTransactionsList } from "../js/request";
 export default {
   name: "Transactions",
   components: {
-    Header
+    Header,
+    Pagination
   },
   data() {
     return {
       transactionList: [],
       loading: false,
-      page: 0,
-      seq: 20
+      currentPage: 1,
+      defaultPageSize: 20,
+      total: 0 // 总条数
     };
   },
   created() {
-    this.getLatestTransactionsList(false, this.page, this.seq);
+    this.getLatestTransactionsList(
+      false,
+      this.currentPage,
+      this.defaultPageSize
+    );
   },
   methods: {
     async getLatestTransactionsList(isLatest, page, seq) {
@@ -92,13 +106,29 @@ export default {
       }
       this.loading = true;
       let res = await getTransactionsList(isLatest, page, seq);
-      console.log(res.data);
       if (res.data.length > 0) {
         this.transactionList = res.data;
+        this.total = res.count;
       } else {
         this.transactionList = [];
       }
       this.loading = false;
+    },
+    changeDefaultSize(size) {
+      this.defaultPageSize = size;
+      this.getLatestTransactionsList(
+        false,
+        this.currentPage,
+        this.defaultPageSize
+      );
+    },
+    changCurrentPage(page) {
+      this.currentPage = page;
+      this.getLatestTransactionsList(
+        false,
+        this.currentPage,
+        this.defaultPageSize
+      );
     },
     jumpDetail(hash) {
       this.$router.push({ path: "tradeDetail", query: { hash: hash } });
