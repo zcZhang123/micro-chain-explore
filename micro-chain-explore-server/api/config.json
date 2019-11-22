@@ -1,0 +1,6 @@
+{
+  "host": "192.168.99.106",
+  "port": 2345,
+  "SubChainAddr": "0x32231dd017075bb997f27bde90a14d80829e9ab0",
+  "dapp": "0x226181662dcf24cc7eee0c6d194dc3ee882ce7b0"
+}
