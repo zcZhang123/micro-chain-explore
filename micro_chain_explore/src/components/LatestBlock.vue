@@ -37,12 +37,6 @@
       class="v-show"
       style="background-color:#fff;margin:0 60px;border: 1px solid #C1E9F1;"
     >
-      <div
-        v-if="loadingBlock"
-        v-loading="true"
-        element-loading-spinner="el-icon-loading"
-        element-loading-text="加载中"
-      ></div>
       <div class="latest-block-nodata">暂无数据</div>
     </div>
   </section>

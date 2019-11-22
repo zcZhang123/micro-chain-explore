@@ -6,6 +6,7 @@ import BlockDetail from '@/page/BlockDetail'
 import Transactions from '@/page/Transactions'
 import TransactionDetail from '@/page/TransactionDetail'
 import WalletDetail from '@/page/WalletDetail'
+import Pagination from '@/components/Pagination'
 Vue.use(Router)
 
 export default new Router({
@@ -39,6 +40,11 @@ export default new Router({
       path: '/walletDetail',
       name: 'WalletDetail',
       component: WalletDetail
+    },
+    {
+      path: '/test',
+      name: 'Pagination',
+      component: Pagination
     }
   ]
 })

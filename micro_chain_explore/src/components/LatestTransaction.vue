@@ -19,13 +19,7 @@
           header-row-class-name="homeHeaderRowclass"
         >
           <ul slot="empty" style="background-color:#fff;margin:0 60px;">
-            <div
-              v-if="loadingTransaction"
-              v-loading="true"
-              element-loading-spinner="el-icon-loading"
-              element-loading-text="加载中"
-            ></div>
-            <div class="latest-trade-nodata" v-else>
+            <div class="latest-trade-nodata">
               <i class="iconfont icon-zanwushuju1"></i>
               暂无数据
             </div>

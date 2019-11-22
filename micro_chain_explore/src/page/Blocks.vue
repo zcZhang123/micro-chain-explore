@@ -83,27 +83,36 @@
         </div>
       </div>
     </div>
+    <Pagination
+      :defaultPageSize="defaultPageSize"
+      :total="total"
+      :currentPage="currentPage"
+      @changeSize="changeDefaultSize"
+      @changCurrentPage="changCurrentPage"
+    ></Pagination>
   </div>
 </template>
 <script>
 import Header from "../components/Header";
+import Pagination from "../components/Pagination";
 import { getBlocksList } from "../js/request";
 export default {
   name: "Blocks",
   components: {
-    Header
+    Header,
+    Pagination
   },
   data() {
     return {
       blocksList: [],
       loading: false,
-      page: 0, // 当前页
-      seq: 20, // 每页展示条数
+      currentPage: 0, // 当前页
+      defaultPageSize: 20, // 每页展示条数
       total: 0 // 总条数
     };
   },
   created() {
-    this.getBlockList(false, this.page, this.seq);
+    this.getBlockList(false, this.currentPage, this.defaultPageSize);
   },
   methods: {
     async getBlockList(isLatest, page, seq) {
@@ -114,10 +123,19 @@ export default {
       let res = await getBlocksList(isLatest, page, seq);
       if (res.data.length > 0) {
         this.blocksList = res.data;
+        this.total = res.count;
       } else {
         this.blocksList = [];
       }
       this.loading = false;
+    },
+    changeDefaultSize(size) {
+      this.defaultPageSize = size;
+      this.getBlockList(false, this.currentPage, this.defaultPageSize);
+    },
+    changCurrentPage(page) {
+      this.currentPage = page;
+      this.getBlockList(false, this.currentPage, this.defaultPageSize);
     },
     jumpDetail(hash) {
       this.$router.push({ path: "blockDetail", query: { hash: hash } });
