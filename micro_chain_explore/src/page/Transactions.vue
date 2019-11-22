@@ -59,6 +59,14 @@
                 >{{scope.row.hash}}</span>
               </template>
             </el-table-column>
+            <el-table-column
+              prop="trade_type"
+              label="交易类型"
+              id="ellipsis"
+              align="right"
+              header-align="right"
+              min-width="22%"
+            ></el-table-column>
             <el-table-column width="30px"></el-table-column>
           </el-table>
         </div>
