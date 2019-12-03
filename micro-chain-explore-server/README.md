@@ -1,4 +1,4 @@
-# micro_chain_explore_server
+# micro-chain-explore-server
 
 a [Sails v1](https://sailsjs.com) application
 

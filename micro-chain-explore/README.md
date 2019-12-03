@@ -1,4 +1,4 @@
-# micro_chain_explore
+# micro-chain-explore
 
 > A Vue.js project
 
