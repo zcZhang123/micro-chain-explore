@@ -14,6 +14,19 @@
       </div>
       <div>
         <div class="trade-list-header">交易记录</div>
+        <div class="trade-list-search">
+          <div style="float:left">
+            <span>日期:</span>
+            <el-date-picker v-model="tradeStart" size="medium" type="date" placeholder="开始日期"></el-date-picker>
+            <el-date-picker v-model="tradeEnd" size="medium" type="date" placeholder="结束日期"></el-date-picker>
+          </div>
+          <div style="float:right">
+            <span>交易对家:</span>
+            <div style="width: 200px;height:60px;float: right">
+              <el-input v-model="tradePartner" size="medium" placeholder="请输入交易对家"></el-input>
+            </div>
+          </div>
+        </div>
         <el-table
           :data="tradeList"
           style="width:100%"
@@ -106,7 +119,10 @@ export default {
       address: "",
       blance: "",
       tradeList: [],
-      loadingTrade: false
+      loadingTrade: false,
+      tradeStart: "", // 交易时间
+      tradeEnd: "", // 交易时间
+      tradePartner: "" // 交易对家
     };
   },
   created() {
@@ -145,12 +161,18 @@ export default {
   padding: 0 70px;
   padding-bottom: 50px;
   .trade-list-header {
-    background: linear-gradient(to right, #0ab1f2, #26e0cc);
+    background: #0ab1f2;
     height: 40px;
     line-height: 40px;
     width: 100%;
     text-align: center;
     color: #ffffff;
+    font-size: 16px;
+  }
+  .trade-list-search {
+    height: 60px;
+    line-height: 60px;
+    width: 100%;
     font-size: 16px;
   }
   .wallet-detail-click-span {
