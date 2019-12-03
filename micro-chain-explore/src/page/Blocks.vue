@@ -138,10 +138,12 @@ export default {
       this.getBlockList(false, this.currentPage, this.defaultPageSize);
     },
     jumpDetail(hash) {
-      this.$router.push({ path: "blockDetail", query: { hash: hash } });
+      let url = window.location.origin + `/#/blockDetail/?hash=${hash}`;
+      window.open(url, "_blank");
     },
     jumpDetailByBlockNum(blockNum) {
-      this.$router.push({ path: "blockDetail", query: { blockNum: blockNum } });
+      let url = window.location.origin + `/#/blockDetail/?blockNum=${blockNum}`;
+      window.open(url, "_blank");
     }
   }
 };

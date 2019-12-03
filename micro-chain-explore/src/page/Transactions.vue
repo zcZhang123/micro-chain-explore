@@ -139,7 +139,8 @@ export default {
       );
     },
     jumpDetail(hash) {
-      this.$router.push({ path: "tradeDetail", query: { hash: hash } });
+      let url = window.location.origin + `/#/tradeDetail/?hash=${hash}`;
+      window.open(url, "_blank");
     },
     rowStyle({ row, rowIndex }) {
       return "height:40px";
