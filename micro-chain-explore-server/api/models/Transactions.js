@@ -22,7 +22,8 @@ module.exports = {
     hash: { type: 'string' },// 交易hash
     upper_hash: { type: 'string' },// 所属区块hash
     block_num: { type: 'string' },// 所属区块高度
-    trade_type: {type:'number'} // 0:充值，1:提币，2:转账，3:其他
+    trade_type: { type: 'number' }, // 0:充值，1:提币，2:转账，3:其他
+    trade_time: { type: 'number' } // 交易时间
   },
 
 };

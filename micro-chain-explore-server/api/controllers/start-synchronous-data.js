@@ -64,7 +64,8 @@ module.exports = {
                   hash: tx.hash,
                   upper_hash: data.Hash,
                   block_num: data.Header.number,
-                  trade_type: type
+                  trade_type: type,
+                  trade_time: data.Header.timestamp
                 }
                 await Transactions.create(txInfo)
               }
