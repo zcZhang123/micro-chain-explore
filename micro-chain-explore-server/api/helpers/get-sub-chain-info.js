@@ -1,4 +1,5 @@
 var http = require('http');
+var https = require('https');
 var config = require('../config.json')
 module.exports = {
 
@@ -34,8 +35,14 @@ module.exports = {
         "Accept": "application/json"
       }
     }
+    var link;
+    if (options.host.indexOf('https://') == -1) {
+      link = http
+    } else {
+      link = https
+    }
     return new Promise(function (resolve, reject) {
-      var req = http.request(options, function (res) {
+      var req = link.request(options, function (res) {
         var _data = '';
         res.on('data', function (chunk) {
           _data += chunk;
