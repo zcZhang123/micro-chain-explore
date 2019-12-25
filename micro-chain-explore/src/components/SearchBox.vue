@@ -1,7 +1,7 @@
 <template>
   <div class="search-box">
     <el-input size="medium" v-model="addressOrHash" placeholder="请输入地址/哈希"></el-input>
-    <el-button type="primary" size="medium" icon="el-icon-search" @click="search">搜索</el-button>
+    <el-button type="primary" size="medium" icon="el-icon-search" @click="search"></el-button>
   </div>
 </template>
 
@@ -44,8 +44,11 @@ export default {
   }
 };
 </script>
-<style>
+<style  lang="scss" scoped>
 .search-box .el-input {
   width: 300px !important;
+}
+.search-box .el-button {
+  background: #3498db !important;
 }
 </style>

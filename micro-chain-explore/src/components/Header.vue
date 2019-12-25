@@ -38,8 +38,7 @@ export default {
   min-height: 70px;
   min-width: 900px;
   padding: 0 70px;
-  background: #409eff;
-  color: #f4f4fb;
+  color: #6c757e;
 }
 .header-search-box {
   display: inline-block;
