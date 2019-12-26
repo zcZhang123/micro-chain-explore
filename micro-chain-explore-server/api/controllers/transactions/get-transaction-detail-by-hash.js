@@ -14,7 +14,7 @@ module.exports = {
   },
 
   fn: async function ({ hash }) {
-    let detail = await Transactions.findOne({ hash: hash });
+    let detail = await Transactions.findOne({ transaction_hash: hash });
     return Utils._return(ResultCode.OK_GET_TRADE_DETAIL, detail);
   }
 

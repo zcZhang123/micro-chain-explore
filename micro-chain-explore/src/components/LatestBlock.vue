@@ -17,17 +17,14 @@
           <div class="latest-block-list-content">
             <div class="latest-block-list-num">
               <span style="margin-right:10px;">高度</span>
-              {{item.block_number}}
+              {{item.number}}
             </div>
             <div>
               <span style="color:#93A3B7;margin-right:10px;">交易数</span>
               <span>{{item.transactions_num}}</span>
             </div>
-            <div
-              class="latest-block-hash"
-              @click="jumpDetail(item.hash)"
-            >{{item.hash}}</div>
-            <div class="latest-block-time">{{item.timestamp}}</div>
+            <div class="latest-block-hash" @click="jumpDetail(item.hash)">{{item.hash}}</div>
+            <div class="latest-block-time">{{formatTime(item.timestamp)}}</div>
           </div>
         </li>
       </div>
@@ -43,6 +40,7 @@
 </template>
 <script>
 import { getBlocksList } from "../js/request";
+import { formatTime } from "../js/utils";
 export default {
   name: "LatestBlock",
   data() {
@@ -73,6 +71,9 @@ export default {
     },
     jumpDetail(hash) {
       this.$router.push({ path: "blockDetail", query: { hash: hash } });
+    },
+    formatTime(timestamp) {
+      return formatTime(timestamp);
     }
   }
 };

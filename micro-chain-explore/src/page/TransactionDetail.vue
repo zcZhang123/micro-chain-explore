@@ -9,7 +9,7 @@
       <ul class="trade_detail_ul">
         <li>
           <span style="font-weight:600;">账本号</span>
-          <span style="font-size:12px;">{{tradeDetail.block_num}}</span>
+          <span style="font-size:12px;">{{tradeDetail.block_number}}</span>
         </li>
         <li>
           <span style="font-weight:600;">交易发起方</span>
@@ -23,12 +23,12 @@
           <span
             @click="jumpWalletDetail(tradeDetail.to)"
             class="trade_from_address"
-          >{{tradeDetail.from}}</span>
+          >{{tradeDetail.to}}</span>
         </li>
-        <li>
+        <!-- <li>
           <span style="font-weight:600;">燃料费用</span>
           <span style="font-size:12px;">{{tradeDetail.gas}}</span>
-        </li>
+        </li> -->
         <li>
           <span style="font-weight:600;">交易类型</span>
           <span style="font-size:12px;">{{tradeDetail.trade_type}}</span>
@@ -36,6 +36,10 @@
         <li>
           <span style="font-weight:600;">成交金额</span>
           <span style="font-size:12px;">{{tradeDetail.value}}</span>
+        </li>
+        <li>
+          <span style="font-weight:600;">input</span>
+          <span style="font-size:12px;">{{tradeDetail.input}}</span>
         </li>
       </ul>
     </div>
@@ -64,6 +68,7 @@ export default {
   methods: {
     async getTradeDetail(hash) {
       let res = await getTradeDetailByHash(hash);
+      console.log(res)
       this.tradeDetail = res;
       console.log(this.tradeDetail);
     },

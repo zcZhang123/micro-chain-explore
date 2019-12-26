@@ -27,6 +27,10 @@ module.exports = {
         code: '0',
         msg: '获取钱包详情成功'
     },
+    ERR_INVALID_ADDRESS: {
+        code: '9001',
+        msg: '无效的地址'
+    },
     ERR_SYSTEM_DB: {
         code: '9999',
         msg: '网络错误，请稍后重试'

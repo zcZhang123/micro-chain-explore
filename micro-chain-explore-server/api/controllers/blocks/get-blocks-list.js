@@ -25,12 +25,12 @@ module.exports = {
       let count;
       if (isLatest) {
         blocksList = await Blocks.find()
-          .sort('block_number DESC')
+          .sort('number DESC')
           .skip(0).limit(6);
         count = 6;
       } else {
         blocksList = await Blocks.find()
-          .sort('block_number DESC')
+          .sort('number DESC')
           .skip((page - 1) * seq).limit(seq)
         count = await Blocks.count()
       }

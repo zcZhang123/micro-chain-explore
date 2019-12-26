@@ -1,6 +1,3 @@
-var http = require('http');
-var https = require('https');
-var config = require('../config.json')
 module.exports = {
 
   friendlyName: 'Get sub chain info',
@@ -14,50 +11,14 @@ module.exports = {
   },
 
   fn: async function () {
-    var data = {
-      jsonrpc: '2.0',
-      id: 0,
-      method: 'ScsRPCMethod.GetSubChainInfo',
-      params:
-      {
-        SubChainAddr: config.SubChainAddr
-      }
-    }
-    var content = JSON.stringify(data)
-
-    var options = {
-      host: config.host,
-      port: config.port,
-      method: 'POST',
-      path: '/rpc',
-      headers: {
-        "Content-Type": 'application/json',
-        "Accept": "application/json"
-      }
-    }
-    var link;
-    if (options.host.indexOf('https://') == -1) {
-      link = http
-    } else {
-      link = https
-    }
     return new Promise(function (resolve, reject) {
-      var req = link.request(options, function (res) {
-        var _data = '';
-        res.on('data', function (chunk) {
-          _data += chunk;
-        });
-        res.on('end', function () {
-          resolve(JSON.parse(_data).result)
-        });
-      }).on('error', function (e) {
+      try {
+        let info = Chain3.chain3.scs.getMicroChainInfo(sails.config.custom.microChain)
+        resolve(info)
+      } catch (e) {
         reject(e)
-      })
-      req.write(content);
-      req.end();
+      }
     })
   }
-
-
 };
 

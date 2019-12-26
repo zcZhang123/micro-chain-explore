@@ -12,7 +12,7 @@
             <img src="../../static/image/help.png" width="14px" height="14px" />
           </el-tooltip>
           <span>子链部署者地址：</span>
-          <span>{{microChainInfo.Sender}}</span>
+          <span>{{microChainInfo.owner}}</span>
         </div>
         <div class="micro-chain-li-div">
           <el-tooltip

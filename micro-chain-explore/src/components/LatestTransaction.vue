@@ -37,8 +37,8 @@
             <template slot-scope="scope">
               <span
                 class="latest-trade-hash"
-                @click="jumpDetail(scope.row.hash)"
-              >{{scope.row.hash}}</span>
+                @click="jumpDetail(scope.row.transaction_hash)"
+              >{{scope.row.transaction_hash}}</span>
             </template>
           </el-table-column>
           <el-table-column

@@ -9,7 +9,7 @@
         </div>
         <div>
           余额：
-          <span style="padding-left:10px;margin-right:20px;">{{blance}}</span>
+          <span style="padding-left:10px;margin-right:20px;">{{balance}}</span>
         </div>
       </div>
       <div>
@@ -45,20 +45,39 @@
           <el-table-column width="30px"></el-table-column>
           <el-table-column type="index" label="序号" min-width="10%" align="left" header-align="left"></el-table-column>
           <el-table-column
+            prop="trade_type"
+            label="区块号"
+            id="ellipsis"
+            width="130px"
+            align="left"
+            header-align="left"
+          >
+            <template slot-scope="scope">
+              <span
+                class="wallet-detail-click-span"
+                @click="scope.row.block_number"
+              >{{scope.row.block_number}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column
             prop="time"
             label="交易时间"
             min-width="20%"
             align="left"
             header-align="left"
-          ></el-table-column>
-          <el-table-column
+          >
+            <template slot-scope="scope">
+              <span class="wallet-detail-click-span">{{formatTime(scope.row.time)}}</span>
+            </template>
+          </el-table-column>
+          <!-- <el-table-column
             prop="trade_type"
             label="交易类型"
             id="ellipsis"
             width="130px"
             align="left"
             header-align="left"
-          ></el-table-column>
+          ></el-table-column>-->
           <el-table-column
             prop="from"
             label="交易发起方"
@@ -97,32 +116,45 @@
             <template slot-scope="scope">
               <span
                 class="wallet-detail-click-span"
-                @click="jumpTradeDetail(scope.row.hash)"
-              >{{scope.row.hash}}</span>
+                @click="jumpTradeDetail(scope.row.transaction_hash)"
+              >{{scope.row.transaction_hash}}</span>
             </template>
           </el-table-column>
         </el-table>
+        <Pagination
+          :defaultPageSize="defaultPageSize"
+          :total="total"
+          :currentPage="currentPage"
+          @changeSize="changeDefaultSize"
+          @changCurrentPage="changCurrentPage"
+        ></Pagination>
       </div>
     </div>
   </div>
 </template>
 <script>
 import Header from "../components/Header";
-import { getTradeAndBlanceByAddress } from "../js/request";
+import Pagination from "../components/Pagination";
+import { formatTime } from "../js/utils";
+import { getTradeAndBalanceByAddress } from "../js/request";
 export default {
   name: "WalletDetail",
   components: {
-    Header
+    Header,
+    Pagination
   },
   data() {
     return {
       address: "",
-      blance: "",
+      balance: "",
       tradeList: [],
       loadingTrade: false,
       tradeStart: "", // 交易时间
       tradeEnd: "", // 交易时间
-      tradePartner: "" // 交易对家
+      tradePartner: "", // 交易对家
+      currentPage: 1, // 当前页
+      defaultPageSize: 20, // 每页展示条数
+      total: 0 // 总条数
     };
   },
   created() {
@@ -131,10 +163,15 @@ export default {
   },
   methods: {
     async getWalletDetail() {
-      let res = await getTradeAndBlanceByAddress(this.address);
+      let res = await getTradeAndBalanceByAddress(
+        this.address,
+        this.currentPage,
+        this.defaultPageSize
+      );
       console.log(res);
-      this.blance = res.blance;
+      this.balance = res.balance;
       this.tradeList = res.trade;
+      this.total = res.count;
     },
     rowStyle({ row, rowIndex }) {
       if (rowIndex % 2 === 0) {
@@ -150,6 +187,33 @@ export default {
     jumpWalletDetail(address) {
       let url = window.location.origin + `/#/walletDetail/?address=${address}`;
       window.open(url, "_blank");
+    },
+    async changeDefaultSize(size) {
+      this.defaultPageSize = size;
+      let res = await getTradeAndBalanceByAddress(
+        this.address,
+        this.currentPage,
+        this.defaultPageSize
+      );
+      console.log(res);
+      this.balance = res.balance;
+      this.tradeList = res.trade;
+      this.total = res.count;
+    },
+    async changCurrentPage(page) {
+      this.currentPage = page;
+      let res = await getTradeAndBalanceByAddress(
+        this.address,
+        this.currentPage,
+        this.defaultPageSize
+      );
+      console.log(res);
+      this.balance = res.balance;
+      this.tradeList = res.trade;
+      this.total = res.count;
+    },
+    formatTime(timestamp) {
+      return formatTime(timestamp);
     }
   }
 };

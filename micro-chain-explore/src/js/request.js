@@ -98,9 +98,9 @@ export const getHashType = async (hash) => {
  * 获取钱包余额、交易
  * @param  address
  */
-export const getTradeAndBlanceByAddress = async (address) => {
+export const getTradeAndBalanceByAddress = async (address, currentPage, defaultPageSize) => {
     try {
-        let res = await api.get_trade_adn_blance_by_address(address);
+        let res = await api.get_trade_adn_balance_by_address(address, currentPage, defaultPageSize);
         if (res.code === '0') {
             return res.data
         }
