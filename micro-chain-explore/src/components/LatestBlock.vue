@@ -21,7 +21,7 @@
             </div>
             <div>
               <span style="color:#93A3B7;margin-right:10px;">交易数</span>
-              <span>{{item.transactions_num}}</span>
+              <span>{{item.transactions.length}}</span>
             </div>
             <div class="latest-block-hash" @click="jumpDetail(item.hash)">{{item.hash}}</div>
             <div class="latest-block-time">{{formatTime(item.timestamp)}}</div>

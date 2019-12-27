@@ -44,8 +44,8 @@
               <template slot-scope="scope">
                 <span
                   class="hash-span"
-                  @click="jumpDetailByBlockNum(scope.row.block_number)"
-                >{{scope.row.block_number}}</span>
+                  @click="jumpDetailByBlockNum(scope.row.number)"
+                >{{scope.row.number}}</span>
               </template>
             </el-table-column>
             <el-table-column
@@ -66,7 +66,11 @@
               min-width="20%"
               header-align="center"
               align="center"
-            ></el-table-column>
+            >
+              <template slot-scope="scope">
+                <span class="hash-span">{{formatTime(scope.row.timestamp)}}</span>
+              </template>
+            </el-table-column>
             <el-table-column
               prop="transactions_num"
               min-width="7%"
@@ -75,7 +79,7 @@
               align="center"
             >
               <template slot-scope="scope">
-                <span class="block-num-span">{{scope.row.transactions_num}}</span>
+                <span class="block-num-span">{{scope.row.transactions.length}}</span>
               </template>
             </el-table-column>
             <el-table-column width="30px"></el-table-column>
@@ -96,6 +100,7 @@
 import Header from "../components/Header";
 import Pagination from "../components/Pagination";
 import { getBlocksList } from "../js/request";
+import { formatTime } from "../js/utils";
 export default {
   name: "Blocks",
   components: {
@@ -144,6 +149,9 @@ export default {
     jumpDetailByBlockNum(blockNum) {
       let url = window.location.origin + `/#/blockDetail/?blockNum=${blockNum}`;
       window.open(url, "_blank");
+    },
+    formatTime(timestamp) {
+      return formatTime(timestamp);
     }
   }
 };

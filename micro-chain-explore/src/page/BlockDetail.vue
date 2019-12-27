@@ -5,7 +5,7 @@
       <div class="block-detail-title">
         <span class="block-detail-title-span">
           当前区块:
-          <span style="color:#06aaf9;padding-left:10px;">{{this.blockData.block_number}}</span>
+          <span style="color:#06aaf9;padding-left:10px;">{{this.blockData.number}}</span>
         </span>
         <span class="block-detail-title-span">
           区块哈希值:
@@ -14,12 +14,12 @@
         <i class></i>
         <ul class="block-detail-header">
           <li>
-            <span style="font-weight:600;">关闭时间</span>
-            <span style="font-size:12px;">{{blockData.timestamp}}</span>
+            <span style="font-weight:600;">时间</span>
+            <span style="font-size:12px;">{{formatTime(blockData.timestamp)}}</span>
           </li>
           <li>
             <span style="font-weight:600;">交易数量</span>
-            <span style="font-size:12px;">{{blockData.transactions_num}}</span>
+            <span style="font-size:12px;">{{blockData.transactions.length}}</span>
           </li>
           <li>
             <span style="font-weight:600;">上一区块哈希值</span>
@@ -58,14 +58,14 @@
               align="left"
               header-align="left"
             ></el-table-column>
-            <el-table-column
+            <!-- <el-table-column
               prop="trade_type"
               label="交易类型"
               id="ellipsis"
               width="130px"
               align="left"
               header-align="left"
-            ></el-table-column>
+            ></el-table-column> -->
             <el-table-column
               prop="hash"
               label="交易哈希"
@@ -77,8 +77,8 @@
               <template slot-scope="scope">
                 <span
                   class="block-detail-hash"
-                  @click="jumpTradeDetail(scope.row.hash)"
-                >{{scope.row.hash}}</span>
+                  @click="jumpTradeDetail(scope.row.transaction_hash)"
+                >{{scope.row.transaction_hash}}</span>
               </template>
             </el-table-column>
             <el-table-column
@@ -111,8 +111,8 @@
                 >{{scope.row.to}}</span>
               </template>
             </el-table-column>
-            <el-table-column prop="gas" label="费用" id="fee" min-width="10%" align="center"></el-table-column>
-            <el-table-column width="30px"></el-table-column>
+            <!-- <el-table-column prop="gas" label="费用" id="fee" min-width="10%" align="center"></el-table-column> -->
+            <!-- <el-table-column width="30px"></el-table-column> -->
           </el-table>
         </div>
       </div>
@@ -122,6 +122,7 @@
 <script>
 import Header from "../components/Header";
 import { getBlockDetailByHash, getBlockDetailByBlockNum } from "../js/request";
+import { formatTime } from "../js/utils";
 export default {
   name: "BlockDetail",
   components: {
@@ -177,6 +178,9 @@ export default {
     jumpWalletDetail(address) {
       let url = window.location.origin + `/#/walletDetail/?address=${address}`;
       window.open(url, "_blank");
+    },
+    formatTime(timestamp) {
+      return formatTime(timestamp);
     }
   }
 };

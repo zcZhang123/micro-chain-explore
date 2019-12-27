@@ -33,7 +33,7 @@ module.exports = {
       let balance = await sails.helpers.getWalletBlance(address);
       let trade = []
       let count;
-      if (!tradePartner) {
+      if (tradePartner) {
         count = await Transactions.count({ from: address, to: tradePartner })
         trade = await Transactions.find(
           {

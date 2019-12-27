@@ -28,7 +28,7 @@
         <!-- <li>
           <span style="font-weight:600;">燃料费用</span>
           <span style="font-size:12px;">{{tradeDetail.gas}}</span>
-        </li> -->
+        </li>-->
         <li>
           <span style="font-weight:600;">交易类型</span>
           <span style="font-size:12px;">{{tradeDetail.trade_type}}</span>
@@ -38,8 +38,9 @@
           <span style="font-size:12px;">{{tradeDetail.value}}</span>
         </li>
         <li>
-          <span style="font-weight:600;">input</span>
-          <span style="font-size:12px;">{{tradeDetail.input}}</span>
+          <span style="font-weight:600;">数据输入</span>
+          <el-input type="textarea" :autosize="{ minRows: 2}" readonly v-model="decodeInputData"></el-input>
+          <el-button @click="decodeInput()">默认按钮</el-button>
         </li>
       </ul>
     </div>
@@ -48,6 +49,7 @@
 <script>
 import Header from "../components/Header";
 import { getTradeDetailByHash } from "../js/request";
+import { decodeInput, chain3 } from "../js/utils";
 export default {
   name: "TransactionDetail",
   components: {
@@ -58,7 +60,8 @@ export default {
       tradeDetail: {},
       hash: "",
       latestdeal: [],
-      loadingTrade: false
+      loadingTrade: false,
+      decodeInputData: ""
     };
   },
   created() {
@@ -68,9 +71,8 @@ export default {
   methods: {
     async getTradeDetail(hash) {
       let res = await getTradeDetailByHash(hash);
-      console.log(res)
       this.tradeDetail = res;
-      console.log(this.tradeDetail);
+      this.decodeInputData = this.tradeDetail.input;
     },
     rowStyle({ row, rowIndex }) {
       if (rowIndex % 2 === 0) {
@@ -86,6 +88,18 @@ export default {
     jumpWalletDetail(address) {
       let url = window.location.origin + `/#/walletDetail/?address=${address}`;
       window.open(url, "_blank");
+    },
+    decodeInput() {
+      let contractAddr = this.tradeDetail.input.slice(0, 42);
+      let encode = this.tradeDetail.input.slice(42);
+      if (chain3.isAddress(contractAddr)) {
+        let decode = decodeInput(encode, contractAddr);
+        this.decodeInputData = !decode
+          ? this.tradeDetail.input
+          : decode;
+      } else {
+        this.decodeInputData = this.tradeDetail.input;
+      }
     }
   }
 };

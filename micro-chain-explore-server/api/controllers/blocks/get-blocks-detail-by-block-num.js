@@ -15,11 +15,10 @@ module.exports = {
 
   fn: async function ({ blockNum }) {
     try {
-      let detail = await Blocks.findOne({ block_number: blockNum })
-      let tradeList = await Transactions.find({ block_num: blockNum })
-      return Utils._return(ResultCode.OK_GET_BLOCKS_DETAIL, { detail: detail, tradeList: tradeList });
+      let detail = await Blocks.findOne({ number: blockNum })
+      return Utils._return(ResultCode.OK_GET_BLOCKS_DETAIL, { detail: detail });
     } catch (error) {
-      return error
+      return this.res.serverError(error);
     }
   }
 

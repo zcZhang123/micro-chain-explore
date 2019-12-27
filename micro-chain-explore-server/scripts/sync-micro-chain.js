@@ -37,7 +37,7 @@ module.exports = {
             let timestamp = info.timestamp;
             for (var i = 0, length = txs.length; i < length; i++) {
               let tx = await sails.helpers.getTransaction(txs[i])
-              // let input = sails.config.custom.dappBase + Chain3.chain3.sha3('redeemFromMicroChain()').substr(2, 10)
+              // let input = sails.config.custom.dappBase + Utils.chain3.sha3('redeemFromMicroChain()').substr(2, 10)
               // let type = 3;
               // if (input == tx.input) {
               //   type = 1
@@ -46,8 +46,8 @@ module.exports = {
                 block_hash: tx.blockHash,
                 block_number: tx.blockNumber,
                 from: tx.from,
-                to: tx.to,
-                value: Chain3.chain3.fromSha(tx.value.toString()),
+                to: Utils.chain3.isAddress(tx.input.slice(0, 42)) ? tx.input.slice(0, 42) : tx.to,
+                value: Utils.chain3.fromSha(tx.value.toString()),
                 input: tx.input,
                 nonce: tx.nonce,
                 r: tx.r,
@@ -69,5 +69,5 @@ module.exports = {
     } catch (error) {
       return error;
     }
-  }
+  },
 };

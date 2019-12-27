@@ -20,7 +20,7 @@ module.exports = {
   fn: async function ({ blocksNum }) {
     return new Promise(function (resolve, reject) {
       try {
-        let block = Chain3.chain3.scs.getBlock(sails.config.custom.microChain, blocksNum)
+        let block = Utils.chain3.scs.getBlock(sails.config.custom.microChain, blocksNum)
         resolve(block)
       } catch (e) {
         reject(e)

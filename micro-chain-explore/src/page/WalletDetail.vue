@@ -165,10 +165,10 @@ export default {
     async getWalletDetail() {
       let res = await getTradeAndBalanceByAddress(
         this.address,
+        this.tradePartner,
         this.currentPage,
         this.defaultPageSize
       );
-      console.log(res);
       this.balance = res.balance;
       this.tradeList = res.trade;
       this.total = res.count;

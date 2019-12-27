@@ -13,7 +13,7 @@ module.exports = {
   fn: async function () {
     return new Promise(function (resolve, reject) {
       try {
-        let info = Chain3.chain3.scs.getMicroChainInfo(sails.config.custom.microChain)
+        let info = Utils.chain3.scs.getMicroChainInfo(sails.config.custom.microChain)
         resolve(info)
       } catch (e) {
         reject(e)

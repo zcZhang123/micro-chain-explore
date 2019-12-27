@@ -20,7 +20,7 @@ module.exports = {
     fn: async function ({ txhash }) {
         return new Promise(function (resolve, reject) {
             try {
-                let tx = Chain3.chain3.scs.getTransactionByHash(sails.config.custom.microChain, txhash)
+                let tx = Utils.chain3.scs.getTransactionByHash(sails.config.custom.microChain, txhash)
                 resolve(tx)
             } catch (e) {
                 reject(e)

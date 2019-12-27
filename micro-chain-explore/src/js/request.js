@@ -96,11 +96,15 @@ export const getHashType = async (hash) => {
 
 /**
  * 获取钱包余额、交易
- * @param  address
+ *
+ * @param {string} address
+ * @param {string} tradePartner
+ * @param {number} currentPage
+ * @param {number} defaultPageSize
  */
-export const getTradeAndBalanceByAddress = async (address, currentPage, defaultPageSize) => {
+export const getTradeAndBalanceByAddress = async (address, tradePartner, currentPage, defaultPageSize) => {
     try {
-        let res = await api.get_trade_adn_balance_by_address(address, currentPage, defaultPageSize);
+        let res = await api.get_trade_adn_balance_by_address(address, tradePartner, currentPage, defaultPageSize);
         if (res.code === '0') {
             return res.data
         }

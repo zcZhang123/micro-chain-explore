@@ -15,15 +15,15 @@ module.exports = {
     try {
       let info = await sails.helpers.getSubChainInfo();
       if (info) {
-        info.Balance = Chain3.chain3.fromSha(Chain3.chain3.toDecimal(info.balance))
-        info.BondLimit = Chain3.chain3.fromSha(Chain3.chain3.toDecimal(info.bondLimit))
-        info.BlockReward = Chain3.chain3.fromSha(Chain3.chain3.toDecimal(info.blockReward))
-        info.TxReward = Chain3.chain3.fromSha(Chain3.chain3.toDecimal(info.txReward))
-        info.ViaReward = Chain3.chain3.fromSha(Chain3.chain3.toDecimal(info.viaReward))
+        info.Balance = Utils.chain3.fromSha(Utils.chain3.toDecimal(info.balance))
+        info.BondLimit = Utils.chain3.fromSha(Utils.chain3.toDecimal(info.bondLimit))
+        info.BlockReward = Utils.chain3.fromSha(Utils.chain3.toDecimal(info.blockReward))
+        info.TxReward = Utils.chain3.fromSha(Utils.chain3.toDecimal(info.txReward))
+        info.ViaReward = Utils.chain3.fromSha(Utils.chain3.toDecimal(info.viaReward))
       }
       return Utils._return(ResultCode.OK_GET_MICRO_CHAIN_INFO, info)
     } catch (error) {
-      return error
+      return this.res.serverError(error);
     }
 
   }
