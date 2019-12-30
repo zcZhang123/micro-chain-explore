@@ -27,7 +27,6 @@ const api = {
     get_block_detail_by_hash(hash) {
         return new Promise(function (resolve, reject) {
             axios.get("/api/v1/blocks/get-blocks-detail-by-hash?hash=" + hash).then((res) => {
-                console.log(res)
                 resolve(res.data)
             }).catch((error) => {
                 reject(error)
@@ -71,7 +70,6 @@ const api = {
     get_trade_adn_balance_by_address(address, tradePartner, page, seq) {
         return new Promise(function (resolve, reject) {
             axios.get("/api/v1/get-wallet-detail-by-address?address=" + address + '&tradePartner=' + tradePartner + '&page=' + page + '&seq=' + seq).then((res) => {
-                console.log(res)
                 resolve(res.data)
             }).catch((error) => {
                 reject(error)

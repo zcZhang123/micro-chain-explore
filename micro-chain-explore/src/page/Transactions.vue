@@ -43,7 +43,7 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column type="index" label="序号" min-width="8%"></el-table-column>
+            <el-table-column type="index" :index="indexMethod" label="序号" min-width="10%"></el-table-column>
             <el-table-column
               prop="hash"
               label="交易哈希"
@@ -55,18 +55,22 @@
               <template slot-scope="scope">
                 <span
                   class="transaction-hash-span"
-                  @click="jumpDetail(scope.row.hash)"
-                >{{scope.row.hash}}</span>
+                  @click="jumpDetail(scope.row.transaction_hash)"
+                >{{scope.row.transaction_hash}}</span>
               </template>
             </el-table-column>
             <el-table-column
               prop="trade_type"
-              label="交易类型"
+              label="交易时间"
               id="ellipsis"
               align="right"
               header-align="right"
               min-width="22%"
-            ></el-table-column>
+            >
+              <template slot-scope="scope">
+                <span class="transaction-hash-span">{{formatTime(scope.row.time)}}</span>
+              </template>
+            </el-table-column>
             <el-table-column width="30px"></el-table-column>
           </el-table>
         </div>
@@ -85,6 +89,7 @@
 import Header from "../components/Header";
 import Pagination from "../components/Pagination";
 import { getTransactionsList } from "../js/request";
+import { formatTime } from "../js/utils";
 export default {
   name: "Transactions",
   components: {
@@ -144,6 +149,12 @@ export default {
     },
     rowStyle({ row, rowIndex }) {
       return "height:40px";
+    },
+    formatTime(timestamp) {
+      return formatTime(timestamp);
+    },
+    indexMethod(index) {
+      return this.defaultPageSize * (this.currentPage - 1) + index + 1;
     }
   }
 };

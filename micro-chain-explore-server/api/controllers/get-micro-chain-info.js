@@ -1,4 +1,3 @@
-var Decimal = require('decimal.js');
 module.exports = {
 
   friendlyName: 'Get micro chain info',

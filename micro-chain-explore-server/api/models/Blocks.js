@@ -11,7 +11,8 @@ module.exports = {
   attributes: {
     extra_data: { type: 'string' },
     hash: {
-      type: 'string'
+      type: 'string',
+      unique: true
     },
     miner: { type: 'string' },
     number: {

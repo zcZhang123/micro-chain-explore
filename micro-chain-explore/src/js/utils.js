@@ -1,13 +1,12 @@
 const abiDecoder = require('abi-decoder');
 const Chain3 = require('chain3');
 
-var chain3 = new Chain3(new Chain3.providers.HttpProvider('https://moac10jc5f041.jccdex.cn:8550'));
-chain3.setScsProvider(new Chain3.providers.HttpProvider('http://59.111.104.18:8547'));
+var chain3 = new Chain3(new Chain3.providers.HttpProvider(process.env.VNODE_URI));
+chain3.setScsProvider(new Chain3.providers.HttpProvider(process.env.SCS_URI));
 
-const dappABI = '[{"constant":true,"inputs":[{"name":"addrs","type":"address[]"},{"name":"addr","type":"address"}],"name":"have","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"pos","type":"uint256"},{"name":"tosend","type":"address[]"},{"name":"amount","type":"uint256[]"},{"name":"times","type":"uint256[]"}],"name":"postFlush","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"dappAddr","type":"address"}],"name":"getDappABI","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"dappAddr","type":"address"},{"name":"dappOwner","type":"address"},{"name":"dappABI","type":"string"},{"name":"state","type":"uint256"}],"name":"updateDapp","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"newlist","type":"address[]"}],"name":"updateNodeList","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"userAddr","type":"address"},{"name":"pos","type":"uint256"}],"name":"getRedeemMapping","outputs":[{"name":"redeemingAddr","type":"address[]"},{"name":"redeemingAmt","type":"uint256[]"},{"name":"redeemingtime","type":"uint256[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getCurNodeList","outputs":[{"name":"nodeList","type":"address[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"curNodeList","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"userAddr","type":"address"}],"name":"getEnterRecords","outputs":[{"name":"enterAmt","type":"uint256[]"},{"name":"entertime","type":"uint256[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"dappAddr","type":"address"}],"name":"removeDapp","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"getDappList","outputs":[{"components":[{"name":"dappAddr","type":"address"},{"name":"owner","type":"address"},{"name":"dappABI","type":"string"},{"name":"state","type":"uint256"}],"name":"","type":"tuple[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"dappRecord","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"dappAddr","type":"address"}],"name":"getDappState","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"dappList","outputs":[{"name":"dappAddr","type":"address"},{"name":"owner","type":"address"},{"name":"dappABI","type":"string"},{"name":"state","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"redeemFromMicroChain","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[],"name":"coinName","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"allDeploySwitch","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"dappAddr","type":"address"},{"name":"dappOwner","type":"address"},{"name":"dappABI","type":"string"}],"name":"registerDapp","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"enterPos","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_name","type":"string"},{"name":"_switch","type":"bool"}],"payable":true,"stateMutability":"payable","type":"constructor"}]'
 var mcObject = chain3.microchain();
 mcObject.setVnodeAddress(process.env.VIA);
-var dappBase = mcObject.getDapp(process.env.MICRO_CHAIN, JSON.parse(dappABI), process.env.DAPP_BASE_ADDR);
+var dappBase = mcObject.getDapp(process.env.MICRO_CHAIN, process.env.DAPP_BASE_ABI, process.env.DAPP_BASE_ADDR);
 
 export const formatTime = (t) => {
     let unixtime = t * 1000;
@@ -34,18 +33,21 @@ export const formatTime = (t) => {
     return toDay;
 };
 
-export const decodeInput = (input, contractAddr) => {
+export const decodeInput = (input, to) => {
     try {
-        if (contractAddr.toLowerCase() === process.env.DAPP_BASE_ADDR) {
-            abiDecoder.addABI(JSON.parse(dappABI));
-        } else if (input.length > 2 && input.substr(0, 2) !== '0x') {
-            abiDecoder.addABI(JSON.parse(dappBase.getDappABI(contractAddr)));
+        let encode;
+        if (to.toLowerCase() === process.env.MICRO_CHAIN.toLowerCase()) {
+            abiDecoder.addABI(process.env.ASM_MICRO_CHAIN_ABI);
+            encode = input;
+        } else if (to.toLowerCase() === process.env.DAPP_BASE_ADDR.toLowerCase()) {
+            abiDecoder.addABI(process.env.DAPP_BASE_ABI);
+            encode = '0x' + input.slice(42);
         } else {
-            return
+            encode = '0x' + input.slice(42);
+            abiDecoder.addABI(JSON.parse(dappBase.getDappABI(to)));
         }
-        let _input = '0x' + input;
-        let decodedData = abiDecoder.decodeMethod(_input);
-        console.log(decodedData);
+
+        let decodedData = abiDecoder.decodeMethod(encode);
         let decode = 'Function:' + decodedData['name'] + '\n';
         let params = decodedData['params'];
         for (var i = 0, length = params.length; i < length; i++) {

@@ -23,12 +23,16 @@ module.exports = {
     let transactionsList;
     let count;
     if (isLatest) {
-      transactionsList = await Transactions.find()
+      transactionsList = await Transactions.find({
+        select: ['transaction_hash', 'time']
+      })
         .sort('createdAt DESC')
         .skip(0).limit(6);
       count = 6;
     } else {
-      transactionsList = await Transactions.find()
+      transactionsList = await Transactions.find({
+        select: ['transaction_hash', 'time']
+      })
         .sort('createdAt DESC')
         .skip((page - 1) * seq).limit(seq)
       count = await Transactions.count();

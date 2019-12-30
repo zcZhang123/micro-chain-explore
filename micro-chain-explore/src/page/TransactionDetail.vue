@@ -4,7 +4,7 @@
     <div class="trade_detail_title">
       <span class="trade_detail_title_span">
         当前交易哈希:
-        <span style="color:#06aaf9;padding-left:10px;">{{tradeDetail.hash}}</span>
+        <span style="color:#06aaf9;padding-left:10px;">{{tradeDetail.transaction_hash}}</span>
       </span>
       <ul class="trade_detail_ul">
         <li>
@@ -40,7 +40,7 @@
         <li>
           <span style="font-weight:600;">数据输入</span>
           <el-input type="textarea" :autosize="{ minRows: 2}" readonly v-model="decodeInputData"></el-input>
-          <el-button @click="decodeInput()">默认按钮</el-button>
+          <el-button @click="decodeInput()">数据解密</el-button>
         </li>
       </ul>
     </div>
@@ -49,7 +49,7 @@
 <script>
 import Header from "../components/Header";
 import { getTradeDetailByHash } from "../js/request";
-import { decodeInput, chain3 } from "../js/utils";
+import { decodeInput } from "../js/utils";
 export default {
   name: "TransactionDetail",
   components: {
@@ -90,16 +90,8 @@ export default {
       window.open(url, "_blank");
     },
     decodeInput() {
-      let contractAddr = this.tradeDetail.input.slice(0, 42);
-      let encode = this.tradeDetail.input.slice(42);
-      if (chain3.isAddress(contractAddr)) {
-        let decode = decodeInput(encode, contractAddr);
-        this.decodeInputData = !decode
-          ? this.tradeDetail.input
-          : decode;
-      } else {
-        this.decodeInputData = this.tradeDetail.input;
-      }
+      let decode = decodeInput(this.tradeDetail.input, this.tradeDetail.to);
+      this.decodeInputData = !decode ? this.tradeDetail.input : decode;
     }
   }
 };

@@ -33,13 +33,20 @@
               </div>
             </div>
             <el-table-column width="30px"></el-table-column>
-            <el-table-column type="index" label="序号" min-width="8%"></el-table-column>
+            <el-table-column
+              type="index"
+              :index="indexMethod"
+              label="序号"
+              min-width="15%"
+              align="left"
+              header-align="left"
+            ></el-table-column>
             <el-table-column
               prop="block_number"
               label="区块高度"
-              min-width="17%"
-              align="left"
-              header-align="left"
+              min-width="10%"
+              align="center"
+              header-align="center"
             >
               <template slot-scope="scope">
                 <span
@@ -54,7 +61,7 @@
               id="ellipsis"
               align="center"
               header-align="center"
-              min-width="57%"
+              min-width="35%"
             >
               <template slot-scope="scope">
                 <span class="block-hash-span" @click="jumpDetail(scope.row.hash)">{{scope.row.hash}}</span>
@@ -63,7 +70,7 @@
             <el-table-column
               prop="timestamp"
               label="时间"
-              min-width="20%"
+              min-width="15%"
               header-align="center"
               align="center"
             >
@@ -73,7 +80,7 @@
             </el-table-column>
             <el-table-column
               prop="transactions_num"
-              min-width="7%"
+              min-width="5%"
               label="交易数"
               header-align="center"
               align="center"
@@ -152,6 +159,9 @@ export default {
     },
     formatTime(timestamp) {
       return formatTime(timestamp);
+    },
+    indexMethod(index) {
+      return this.defaultPageSize * (this.currentPage - 1) + index + 1;
     }
   }
 };

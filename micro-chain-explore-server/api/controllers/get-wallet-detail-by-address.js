@@ -39,13 +39,13 @@ module.exports = {
           {
             where: { from: address, to: tradePartner },
             select: ['block_number', 'from', 'to', 'transaction_hash', 'time']
-          }).skip((page - 1) * seq).limit(seq)
+          }).sort('createdAt DESC').skip((page - 1) * seq).limit(seq)
       } else {
         count = await Transactions.count({ or: [{ from: address }, { to: address }] })
         trade = await Transactions.find({
           where: { or: [{ from: address }, { to: address }] },
           select: ['block_number', 'from', 'to', 'transaction_hash', 'time']
-        }).skip((page - 1) * seq).limit(seq)
+        }).sort('createdAt DESC').skip((page - 1) * seq).limit(seq)
       }
       return Utils._return(ResultCode.OK_GET_WALLET_DETAIL, { balance: balance, trade: trade, count: count })
     } catch (error) {

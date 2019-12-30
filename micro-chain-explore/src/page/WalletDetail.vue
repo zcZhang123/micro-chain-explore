@@ -43,7 +43,14 @@
             <div class="noDataHome" v-else>暂无数据</div>
           </ul>
           <el-table-column width="30px"></el-table-column>
-          <el-table-column type="index" label="序号" min-width="10%" align="left" header-align="left"></el-table-column>
+          <el-table-column
+            type="index"
+            :index="indexMethod"
+            label="序号"
+            min-width="10%"
+            align="left"
+            header-align="left"
+          ></el-table-column>
           <el-table-column
             prop="trade_type"
             label="区块号"
@@ -62,7 +69,7 @@
           <el-table-column
             prop="time"
             label="交易时间"
-            min-width="20%"
+            min-width="40%"
             align="left"
             header-align="left"
           >
@@ -192,10 +199,10 @@ export default {
       this.defaultPageSize = size;
       let res = await getTradeAndBalanceByAddress(
         this.address,
+        this.tradePartner,
         this.currentPage,
         this.defaultPageSize
       );
-      console.log(res);
       this.balance = res.balance;
       this.tradeList = res.trade;
       this.total = res.count;
@@ -204,16 +211,19 @@ export default {
       this.currentPage = page;
       let res = await getTradeAndBalanceByAddress(
         this.address,
+        this.tradePartner,
         this.currentPage,
         this.defaultPageSize
       );
-      console.log(res);
       this.balance = res.balance;
       this.tradeList = res.trade;
       this.total = res.count;
     },
     formatTime(timestamp) {
       return formatTime(timestamp);
+    },
+    indexMethod(index) {
+      return this.defaultPageSize * (this.currentPage - 1) + index + 1;
     }
   }
 };

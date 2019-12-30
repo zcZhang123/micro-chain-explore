@@ -20,7 +20,6 @@ module.exports.routes = {
   ***************************************************************************/
 
   '/': { view: 'pages/homepage' },
-  'POST /api/v1/start-synchronous-data': { action: 'start-synchronous-data' },
   'GET /api/v1/blocks/get-blocks-list': { action: 'blocks/get-blocks-list' },
   'GET /api/v1/get-hash-type': { action: 'get-hash-type' },
   'GET /api/v1/blocks/get-blocks-detail-by-hash': { action: 'blocks/get-blocks-detail-by-hash' },

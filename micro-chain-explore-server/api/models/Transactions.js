@@ -44,7 +44,8 @@ module.exports = {
       type: 'number'
     },
     transaction_hash: {
-      type: 'string'
+      type: 'string',
+      unique: true
     },
     transaction_index: {
       type: 'number'
