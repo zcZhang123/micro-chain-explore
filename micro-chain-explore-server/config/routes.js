@@ -27,7 +27,9 @@ module.exports.routes = {
   'GET /api/v1/transactions/get-transactions-list': { action: 'transactions/get-transactions-list' },
   'GET /api/v1/transactions/get-transaction-detail-by-hash': { action: 'transactions/get-transaction-detail-by-hash' },
   'GET /api/v1/get-wallet-detail-by-address': { action: 'get-wallet-detail-by-address' },
-  'GET /api/v1/get-micro-chain-info': { action: 'get-micro-chain-info' }
+  'GET /api/v1/get-micro-chain-info': { action: 'get-micro-chain-info' },
+  'GET /api/v1/orders/get-orders-by-address': { action: 'orders/get-orders-by-address' },
+  'GET /api/v1/orders/get-orders-by-pairs': { action: 'orders/get-orders-by-pairs' },
 
 
   /***************************************************************************
@@ -40,6 +42,4 @@ module.exports.routes = {
   * not match any of those, it is matched against static assets.             *
   *                                                                          *
   ***************************************************************************/
-
-
 };

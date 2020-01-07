@@ -27,6 +27,10 @@ module.exports = {
         code: '0',
         msg: '获取钱包详情成功'
     },
+    OK_GET_ORDER: {
+        code: '0',
+        msg: '获取订单信息成功'
+    },
     ERR_INVALID_ADDRESS: {
         code: '9001',
         msg: '无效的地址'

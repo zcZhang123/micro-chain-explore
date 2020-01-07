@@ -24,7 +24,7 @@
             <img src="../../static/image/help.png" width="14px" height="14px" />
           </el-tooltip>
           <span>余额：</span>
-          <span>{{microChainInfo.Balance}}</span>
+          <span>{{getBalance()}}</span>
         </div>
       </li>
       <li>
@@ -88,6 +88,7 @@
 </template>
 <script>
 import { getMicroChainInfo } from "../js/request";
+import { chain3 } from "../js/utils";
 export default {
   name: "MicroChainInfo",
   data() {
@@ -102,6 +103,9 @@ export default {
     async getChainIfo() {
       let res = await getMicroChainInfo();
       this.microChainInfo = res;
+    },
+    getBalance() {
+      return chain3.fromSha(chain3.mc.getBalance(process.env.MICRO_CHAIN));
     }
   }
 };
