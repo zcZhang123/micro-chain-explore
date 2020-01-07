@@ -31,6 +31,18 @@ module.exports = {
         code: '0',
         msg: '获取订单信息成功'
     },
+    OK_GET_KLINE: {
+        code: '0',
+        msg: '获取K线数据成功'
+    },
+    OK_GET_TICKER: {
+        code: '0',
+        msg:'获取指定币种行情成功'
+    },
+    OK_GET_ALL_TICKERS: {
+        code: '0',
+        msg:'获取所以币种行情成功'
+    },
     ERR_INVALID_ADDRESS: {
         code: '9001',
         msg: '无效的地址'
