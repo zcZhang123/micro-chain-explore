@@ -30,7 +30,7 @@ module.exports.routes = {
   'GET /api/v1/get-micro-chain-info': { action: 'get-micro-chain-info' },
   'GET /api/v1/orders/get-orders-by-address': { action: 'orders/get-orders-by-address' },
   'GET /api/v1/orders/get-orders-by-pairs': { action: 'orders/get-orders-by-pairs' },
-
+  'GET /api/v1/orders/get-trades-by-pairs': { action: 'orders/get-trades-by-pairs' },
 
   /***************************************************************************
   *                                                                          *

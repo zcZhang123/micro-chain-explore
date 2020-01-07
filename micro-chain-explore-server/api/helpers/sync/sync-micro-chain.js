@@ -44,7 +44,7 @@ module.exports = {
                   block_hash: tx.blockHash,
                   block_number: tx.blockNumber,
                   from: tx.from,
-                  to: _.indexOf(dapps, tx.input.slice(0, 42)) ? tx.input.slice(0, 42) : tx.to,
+                  to: _.indexOf(dapps, tx.input.slice(0, 42)) != -1 ? tx.input.slice(0, 42) : tx.to,
                   value: Utils.chain3.fromSha(tx.value.toString()),
                   input: tx.input,
                   nonce: tx.nonce,
