@@ -28,7 +28,7 @@ module.exports = {
       let orders = await Orders.find(
         {
           where: { user: address },
-          select: ['order_id', 'tokenGet', 'amountGet', 'tokenGive', 'amountGive', 'sell_price', 'buy_price', 'expires', 'time']
+          select: ['order_id', 'order_type', 'tokenGet', 'amountGet', 'tokenGive', 'amountGive', 'price', 'expires', 'time']
         }).sort('createdAt DESC').skip((page - 1) * seq).limit(seq)
       return Utils._return(ResultCode.OK_GET_ORDER, { orders: orders, count: count })
     } catch (error) {

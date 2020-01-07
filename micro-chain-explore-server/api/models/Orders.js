@@ -10,17 +10,25 @@ module.exports = {
 
   attributes: {
     order_id: { type: 'string' },
+    order_type: {
+      type: 'number',
+      description: '0:create, 1:trade, 2:cancel'
+    },
+    type: { type: 'string' },
     user: { type: 'string' },
     tokenGet: { type: 'string' },
     amountGet: { type: 'string' },
     tokenGive: { type: 'string' },
     amountGive: { type: 'string' },
-    buy_price: { type: 'string' },
-    sell_price: { type: 'string' },
+    price: { type: 'string' },
     expires: { type: 'number' },
     nonce: { type: 'number' },
+    amount: { type: 'string' },
     time: { type: 'string' },
-    update_index: { type: 'number' }
+    update_index: {
+      type: 'number',
+      description: 'save the latest update index'
+    }
   },
 
 };
