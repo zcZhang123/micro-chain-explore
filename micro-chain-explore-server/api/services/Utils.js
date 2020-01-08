@@ -15,17 +15,23 @@ exports._return = function (msg, result) {
 exports.getTypeAndPrice = function (param) {
     let price
     let type
-    let isBuy = _.find(pairs, (pair) => {
+    let base
+    let counter
+    let isSell = _.find(pairs, (pair) => {
         return pair.base === param.get.token && pair.counter === param.give.token
     });
-    if (isBuy) {
-        price = new BigNumber(param.get.amount).dividedBy(new BigNumber(param.give.amount)).toString();
-        type = 'buy';
-        return { price, type }
+    if (isSell) {
+        price = new BigNumber(param.give.amount).dividedBy(new BigNumber(param.get.amount)).toString();
+        type = 'sell';
+        base = param.get.amount
+        counter = param.give.amount
+        return { price, type, base, counter }
     }
-    price = new BigNumber(param.give.amount).dividedBy(new BigNumber(param.get.amount)).toString();
-    type = 'sell';
-    return { price, type }
+    price = new BigNumber(param.get.amount).dividedBy(new BigNumber(param.give.amount)).toString();
+    type = 'buy';
+    base = param.give.amount
+    counter = param.get.amount
+    return { price, type, base, counter }
 }
 
 
