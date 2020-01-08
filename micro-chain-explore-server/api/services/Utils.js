@@ -12,7 +12,7 @@ exports._return = function (msg, result) {
     return { code: msg.code, data: result, msg: msg.msg }
 }
 
-exports.getTpyeAndPrice = function (param) {
+exports.getTypeAndPrice = function (param) {
     let price
     let type
     let isBuy = _.find(pairs, (pair) => {
@@ -36,6 +36,7 @@ redisClient.auth(123456);
 
 exports.redisClient = redisClient;
 
+// 获取当天零点的时间戳
 exports.getTodayTimestamp = function () {
     let date = new Date()
     date.setHours(0);
@@ -44,4 +45,95 @@ exports.getTodayTimestamp = function () {
     date.setMilliseconds(0)
     var time = date.getTime()
     return time;
+}
+
+// 判断K线是否需要创建新的数据
+exports.isNewCycle = function (timestamp, newTimestamp, cycle, offset) {
+    if (cycle != 'month' || cycle != 'year') {
+        if (timestamp <= newTimestamp - offset) {
+            return true
+        } else {
+            return false
+        }
+    } else {
+        let time = new Date(timestamp);
+        let year = time.getFullYear();
+        let month = time.getMonth();
+        let newTime = new Date(newTimestamp);
+        let newYear = time.getFullYear();
+        let newMonth = newTime.getMonth();
+        if (cycle == 'month') {
+            if (newYear > year) {
+                return true
+            } else {
+                if (newMonth > month) {
+                    return true
+                } else {
+                    return false
+                }
+            }
+        } else if (cycle == 'year') {
+            if (newYear > year) {
+                return true
+            } else {
+                return false
+            }
+        }
+    }
+}
+
+// 根据K线周期返回新的时间戳
+exports.getTimeByCycle = function (timestamp, cycle) {
+    let unixTimestamp = new Date(timestamp);
+    let time = timestamp;
+    let seconds = unixTimestamp.getSeconds();
+    let minute = unixTimestamp.getMinutes();
+    let hour = unixTimestamp.getHours();
+    let month = unixTimestamp.getMonth();
+    let year = unixTimestamp.getFullYear();
+    let remainder = 0; // 余数
+    if (cycle.indexOf('minute') != -1) {
+        if (cycle == '5minute') {
+            remainder = minute % 5;
+        } else if (cycle == '15minute') {
+            remainder = minute % 15;
+        } else if (cycle == '30minute') {
+            remainder = minute % 30
+        }
+        time = timestamp - (remainder * 60000) - (seconds * 1000);
+    } else if (cycle.indexOf('hour') != -1) {
+        if (cycle == '4hour') {
+            remainder = hour % 4
+        }
+        time = timestamp - (remainder * 3600000) - (minute * 60000) - (seconds * 1000)
+    } else if (cycle == 'day' || cycle == 'week') {
+        if (cycle == 'week') {
+            let dayInWeek = unixTimestamp.getDay()
+            if (dayInWeek == 0) {
+                remainder = 6
+            } else {
+                remainder = dayInWeek - 1
+            }
+        }
+        time = timestamp - (remainder * 86400000) - (hour * 3600000) - (minute * 60000) - (seconds * 1000)
+    } else if (cycle == 'month') {
+        time = new Date(year, month, 1, 0, 0, 0, 0).getTime();
+    } else if (cycle == 'year') {
+        time = new Date(year, 0, 1, 0, 0, 0, 0).getTime();
+    }
+    return time;
+}
+
+// 判断交易类型是否是交易挂单
+exports.isTrade = function (input) {
+    let address = input.substr(0, 42)
+    if (address != sails.config.custom.ethdAddr) {
+        return false
+    }
+    let data = input.substr(42, 8)
+    if (data == sails.config.custom.trade) {
+        return true
+    } else {
+        return false
+    }
 }

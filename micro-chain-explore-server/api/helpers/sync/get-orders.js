@@ -45,7 +45,7 @@ module.exports = {
               amount: amountGive
             },
           }
-          let tp = Utils.getTpyeAndPrice(param);
+          let tp = Utils.getTypeAndPrice(param);
           let price = tp.price;
           let type = tp.type;
 
@@ -84,7 +84,7 @@ module.exports = {
               amount: amountGive
             },
           }
-          let tp = Utils.getTpyeAndPrice(param);
+          let tp = Utils.getTypeAndPrice(param);
           let price = tp.price;
           let type = tp.type;
 
@@ -124,7 +124,7 @@ module.exports = {
               amount: amountGive
             },
           }
-          let tp = Utils.getTpyeAndPrice(param);
+          let tp = Utils.getTypeAndPrice(param);
           let price = tp.price;
           let type = tp.type;
 

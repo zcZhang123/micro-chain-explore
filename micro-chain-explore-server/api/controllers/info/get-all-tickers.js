@@ -12,13 +12,13 @@ module.exports = {
 
   fn: async function () {
     try {
-      var coinsPairs = require('../../../assets/config/coins_pairs_config.json')
+      var pairs = require('../../../assets/config/pairs.json')
       let tickers = {};
-      for (let i = 0, len = coinsPairs.length; i < len; i++) {
-        let key = coinsPairs[i].base + '-' + coinsPairs[i].counter + '/day';
+      for (let i = 0, len = pairs.length; i < len; i++) {
+        let key = pairs[i].base + '-' + pairs[i].counter + '/day';
         let klineData = await sails.helpers.getRedisKline(key);
         let tickerData = await sails.helpers.getTickerInfo(klineData);
-        let name = coinsPairs[i].counterTitle + '-' + coinsPairs[i].baseTitle
+        let name = pairs[i].counterName + '-' + pairs[i].baseName
         tickers[name] = tickerData;
       }
       return Utils._return(ResultCode.OK_GET_TICKER, tickers)
