@@ -9,20 +9,61 @@ module.exports = {
   primaryKey: 'id',
 
   attributes: {
-    nonce: { type: 'number' },
-    syscnt: { type: 'number' },
-    gas_price: { type: 'number' },
-    gas: { type: 'number' },
-    from: { type: 'string' }, // 交易发起钱包
-    to: { type: 'string' }, // 交易接收钱包
-    value: { type: 'number', columnType: 'Decimail128' },// 交易金额
-    input: { type: 'string' },
-    sharding_flag: { type: 'number' },
-    via: { type: "ref" },
-    hash: { type: 'string' },// 交易hash
-    upper_hash: { type: 'string' },// 所属区块hash
-    block_num: { type: 'string' },// 所属区块高度
-    trade_type: {type:'number'} // 0:充值，1:提币，2:转账，3:其他
+    block_hash: {
+      type: 'string'
+    },
+    block_number: {
+      type: 'number'
+    },
+    from: {
+      type: 'string'
+    },
+    to: {
+      type: 'string'
+    },
+    value: {
+      type: 'number',
+      columnType: 'Decimail128'
+    },
+    input: {
+      type: 'string'
+    },
+    nonce: {
+      type: 'number'
+    },
+    r: {
+      type: 'string'
+    },
+    s: {
+      type: 'string'
+    },
+    v: {
+      type: 'number'
+    },
+    sharding_flag: {
+      type: 'number'
+    },
+    transaction_hash: {
+      type: 'string',
+      unique: true
+    },
+    transaction_index: {
+      type: 'number'
+    },
+    time: {
+      type: 'number'
+    },
+    contractAddress: { type: 'string' },
+    status: {
+      type: 'boolean',
+      defaultsTo: false
+    },
+    logs: {
+      type: 'json'
+    },
+    logs_length: {
+      type: 'number'
+    }
   },
 
 };

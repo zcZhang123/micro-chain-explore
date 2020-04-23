@@ -10,15 +10,14 @@ module.exports = {
 
   attributes: {
     sender: { type: 'string' },
-    block_number: {type: 'number'}, // 最新区块
-    block_number_db: {type: 'number'}, // 数据库当前存储最新区块
+    block_number: {type: 'number'},
+    block_number_db: { type: 'number' },
     scs_list: { type: 'json' },
-    balance: { type: 'number' }, // 余额
+    balance: { type: 'number' },
     bond_limit: { type: 'number' },
     block_reward: { type: 'number' },
     tx_reward: { type: 'number' },
     via_reward: { type: 'number' }
-
   },
 
 };

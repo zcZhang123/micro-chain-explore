@@ -1,163 +1,235 @@
 <template>
-  <div>
-    <Header></Header>
+  <div class="container">
     <div class="block-detail">
       <div class="block-detail-title">
         <span class="block-detail-title-span">
-          当前区块:
-          <span style="color:#06aaf9;padding-left:10px;">{{this.blockData.block_number}}</span>
+          {{this.$t("message.current_block")}}
+          <span
+            style="color:#06aaf9;padding-left:10px;"
+          >{{this.blockData.number}}</span>
         </span>
         <span class="block-detail-title-span">
-          区块哈希值:
-          <span style="padding-left:10px;text-align:right;">{{blockData.hash}}</span>
+          {{this.$t("message.block_hash")}}
+          <span
+            style="padding-left:10px;text-align:right;"
+          >{{blockData.hash}}</span>
+          <Clipboard ref="copy" @click.native="copyTextToClipboard(blockData.hash)"></Clipboard>
         </span>
-        <i class></i>
-        <ul class="block-detail-header">
+        <ul class="block-detail-ul">
           <li>
-            <span style="font-weight:600;">关闭时间</span>
-            <span style="font-size:12px;">{{blockData.timestamp}}</span>
+            <span style="font-weight:600;">{{this.$t("message.date")}}</span>
+            <span style="font-size:12px;">{{blockData.timestamp | formatTime}}</span>
           </li>
           <li>
-            <span style="font-weight:600;">交易数量</span>
-            <span style="font-size:12px;">{{blockData.transactions_num}}</span>
+            <span style="font-weight:600;">{{this.$t("message.txs")}}</span>
+            <span style="font-size:12px;">{{getLength(blockData.transactions)}}</span>
           </li>
           <li>
-            <span style="font-weight:600;">上一区块哈希值</span>
-            <span
-              @click="jumpBlockDetail(blockData.parent_hash)"
-              class="block-detail-parent-hash"
-            >{{blockData.parent_hash}}</span>
+            <span style="font-weight:600;margin-right:10px">{{this.$t("message.pre_block_hash")}}</span>
+            <div>
+              <span
+                @click="jumpBlockDetail(blockData.parent_hash)"
+                class="block-detail-parent-hash"
+              >{{blockData.parent_hash}}</span>
+              <Clipboard ref="copy" @click.native="copyTextToClipboard(blockData.parent_hash)"></Clipboard>
+            </div>
           </li>
         </ul>
       </div>
 
       <div class="block-detail-list">
         <div>
-          <div class="block-detail-list-top">交易记录</div>
-          <el-table
-            :data="tradeList"
-            style="width:100%"
-            :row-style="rowStyle"
-            header-row-class-name="homeHeaderRowclass"
-          >
-            <ul slot="empty" style="background-color:#fff;margin:0 60px;">
-              <div
-                v-if="loadingTrade"
-                style="height:100px;width:100%"
-                v-loading="true"
-                element-loading-spinner="el-icon-loading"
-                element-loading-text="加载中"
-              ></div>
-              <div class="noDataHome" v-else>暂无数据</div>
-            </ul>
-            <el-table-column width="30px"></el-table-column>
-            <el-table-column
-              type="index"
-              label="序号"
-              min-width="8%"
-              align="left"
-              header-align="left"
-            ></el-table-column>
-            <el-table-column
-              prop="trade_type"
-              label="交易类型"
-              id="ellipsis"
-              width="130px"
-              align="left"
-              header-align="left"
-            ></el-table-column>
-            <el-table-column
-              prop="hash"
-              label="交易哈希"
-              id="ellipsis"
-              align="center"
-              header-align="center"
-              min-width="47%"
+          <div class="block-detail-list-top">{{this.$t("message.transactions")}}</div>
+          <div class="table-fixed">
+            <el-table
+              :data="tradeList"
+              :row-style="rowStyle"
+              header-row-class-name="homeHeaderRowclass"
+              class="block-detail-list-table-width"
             >
-              <template slot-scope="scope">
-                <span
-                  class="block-detail-hash"
-                  @click="jumpTradeDetail(scope.row.hash)"
-                >{{scope.row.hash}}</span>
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="from"
-              label="发起方"
-              id="ellipsis"
-              align="right"
-              header-align="right"
-              min-width="28%"
-            >
-              <template slot-scope="scope">
-                <span
-                  class="block-detail-hash"
-                  @click="jumpWalletDetail(scope.row.from)"
-                >{{scope.row.from}}</span>
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="to"
-              label="接收方"
-              id="ellipsis"
-              align="right"
-              header-align="right"
-              min-width="28%"
-            >
-              <template slot-scope="scope">
-                <span
-                  class="block-detail-hash"
-                  @click="jumpWalletDetail(scope.row.to)"
-                >{{scope.row.to}}</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="gas" label="费用" id="fee" min-width="10%" align="center"></el-table-column>
-            <el-table-column width="30px"></el-table-column>
-          </el-table>
+              <ul slot="empty" style="background-color:#fff;margin:0 60px;">
+                <div
+                  v-if="loadingTrade"
+                  style="height:100px;width:100%"
+                  v-loading="true"
+                  element-loading-spinner="el-icon-loading"
+                  :element-loading-text="$t('message.loading')"
+                ></div>
+                <div class="noDataHome" v-else>{{this.$t("message.noData")}}</div>
+              </ul>
+              <el-table-column width="30px"></el-table-column>
+              <el-table-column
+                type="index"
+                :index="indexMethod"
+                :label="$t('message.seq')"
+                min-width="5%"
+                align="left"
+                header-align="left"
+              ></el-table-column>
+              <el-table-column
+                prop="hash"
+                :label="$t('message.txHash')"
+                id="ellipsis"
+                align="center"
+                header-align="center"
+                min-width="35%"
+              >
+                <template slot-scope="scope">
+                  <span
+                    class="block-detail-hash"
+                    @click="jumpTradeDetail(scope.row.transaction_hash)"
+                  >{{scope.row.transaction_hash}}</span>
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="from"
+                :label="$t('message.from')"
+                id="ellipsis"
+                align="center"
+                header-align="center"
+                min-width="28%"
+              >
+                <template slot-scope="scope">
+                  <span
+                    class="block-detail-hash"
+                    @click="jumpWalletDetail(scope.row.from)"
+                  >{{scope.row.from}}</span>
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="to"
+                :label="$t('message.to')"
+                id="ellipsis"
+                align="center"
+                header-align="center"
+                min-width="28%"
+              >
+                <template slot-scope="scope">
+                  <span
+                    class="block-detail-hash"
+                    @click="jumpWalletDetail(scope.row.to)"
+                  >{{scope.row.to}}</span>
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="trade_type"
+                :label="$t('message.status')"
+                id="ellipsis"
+                align="center"
+                header-align="center"
+                min-width="10%"
+              >
+                <template slot-scope="scope">
+                  <span :style="getColor(scope.row.status)">{{status(scope.row.status)}}</span>
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="trade_type"
+                :label="$t('message.tx_type')"
+                id="ellipsis"
+                align="right"
+                header-align="right"
+                min-width="10%"
+              >
+                <template slot-scope="scope">
+                  <span style="font-size:12px;">{{flag(scope.row.sharding_flag)}}</span>
+                </template>
+              </el-table-column>
+              <el-table-column width="30px"></el-table-column>
+            </el-table>
+          </div>
         </div>
       </div>
+      <Pagination
+        :defaultPageSize="defaultPageSize"
+        :total="total"
+        :currentPage="currentPage"
+        @changeSize="changeDefaultSize"
+        @changCurrentPage="changCurrentPage"
+      ></Pagination>
     </div>
   </div>
 </template>
 <script>
-import Header from "../components/Header";
+import Clipboard from "../components/CopyToClipboard";
+import Pagination from "../components/Pagination";
 import { getBlockDetailByHash, getBlockDetailByBlockNum } from "../js/request";
+import { formatStatus, formatShadingFlag } from "../js/utils";
 export default {
   name: "BlockDetail",
   components: {
-    Header
+    Pagination,
+    Clipboard
   },
   data() {
     return {
       hash: "",
+      blockNum: "",
       blockData: {},
       tradeList: [],
+      currentPage: 1,
+      defaultPageSize: 20,
+      total: 0, // 总条数
       loadingTrade: false
     };
   },
   created() {
     this.hash = this.$route.query.hash;
     if (this.hash) {
-      this.getBlockDetail(this.hash);
+      this.getBlockDetail();
     } else {
-      let blockNum = this.$route.query.blockNum;
-      this.getBlockDetailByNum(blockNum);
+      this.blockNum = this.$route.query.blockNum;
+      this.getBlockDetailByNum();
     }
   },
   methods: {
-    async getBlockDetail(hash) {
-      let res = await getBlockDetailByHash(hash);
-      this.blockData = res.detail;
-      this.tradeList = res.tradeList;
-      console.log(this.tradeList);
+    status(status) {
+      return this.$t(formatStatus(status));
     },
-    async getBlockDetailByNum(blockNum) {
-      let res = await getBlockDetailByBlockNum(blockNum);
+    flag(flag) {
+      return this.$t(formatShadingFlag(flag));
+    },
+    async getBlockDetail() {
+      let res = await getBlockDetailByHash(
+        this.hash,
+        this.currentPage,
+        this.defaultPageSize
+      );
       this.blockData = res.detail;
       this.tradeList = res.tradeList;
+      this.total = res.count;
+    },
+    async getBlockDetailByNum() {
+      let res = await getBlockDetailByBlockNum(
+        this.blockNum,
+        this.currentPage,
+        this.defaultPageSize
+      );
+      this.blockData = res.detail;
+      this.tradeList = res.tradeList;
+      this.total = res.count;
+    },
+    copyTextToClipboard(text) {
+      this.$refs.copy.copyToClipboard(text);
     },
     clearGopage() {
       this.gopage = "";
+    },
+    async changeDefaultSize(size) {
+      this.defaultPageSize = size;
+      if (this.hash && this.hash !== "") {
+        this.getBlockDetail();
+      } else {
+        this.getBlockDetailByNum();
+      }
+    },
+    async changCurrentPage(page) {
+      this.currentPage = page;
+      if (this.hash && this.hash !== "") {
+        this.getBlockDetail();
+      } else {
+        this.getBlockDetailByNum();
+      }
     },
     rowStyle({ row, rowIndex }) {
       if (rowIndex % 2 === 0) {
@@ -177,99 +249,25 @@ export default {
     jumpWalletDetail(address) {
       let url = window.location.origin + `/#/walletDetail/?address=${address}`;
       window.open(url, "_blank");
+    },
+    getColor(status) {
+      if (status) {
+        return "color: #06aaf9";
+      } else {
+        return "color: red";
+      }
+    },
+    getLength(trans) {
+      if (trans) {
+        return trans.length;
+      }
+    },
+    indexMethod(index) {
+      return this.defaultPageSize * (this.currentPage - 1) + index + 1;
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
-.block-detail {
-  text-align: center;
-  min-width: 900px;
-  padding: 0 70px;
-  padding-bottom: 50px;
-  background: #f2f8fc;
-}
-.block-detail-title {
-  text-align: left;
-  div {
-    display: inline-block;
-  }
-  .block-detail-title-span {
-    width: 25%;
-    padding: 16px 0;
-    overflow: hidden;
-    font-weight: 600;
-    white-space: nowrap;
-    font-size: 16px;
-    color: #3e3f45;
-    float: left;
-  }
-  .block-detail-title-span:nth-child(2) {
-    color: #18c9dd;
-    font-size: 14px;
-    font-weight: 400;
-    white-space: nowrap;
-    width: calc(75% - 22px);
-    text-align: right;
-  }
-  .block-detail-header {
-    width: 97%;
-    overflow: hidden;
-    border: 1.8px solid #c1e9f1;
-    height: 120px;
-    border-radius: 8px;
-    background: #ffffff;
-    margin-bottom: 20px;
-    li {
-      display: flex;
-      justify-content: space-between;
-      height: 40px;
-      overflow: hidden;
-      font-size: 14px;
-      line-height: 40px;
-      padding: 0 20px;
-      color: #5f5d5d;
-      border-bottom: 1px solid #e0e8ed;
-    }
-    li:nth-child(3) {
-      border-bottom: 0;
-    }
-  }
-}
-.block-detail-list {
-  background-color: #f2f8fc;
-  border: 1px solid #d0eef5;
-}
-.block-detail-list {
-  background: linear-gradient(to right, #0ab1f2, #26e0cc);
-  height: 40px;
-  line-height: 40px;
-  text-align: center;
-  color: #ffffff;
-  font-size: 16px;
-  border-bottom: 1px #d0eef5;
-}
-.block-detail-parent-hash {
-  color: #636161;
-  font-size: 12px;
-  font-family: PingFangSC-Regular;
-}
-.block-detail-parent-hash:hover {
-  color: #06aaf9;
-  cursor: pointer;
-  font-weight: 600;
-}
-.block-detail-hash {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: #6f6868;
-  font-size: 14px;
-  cursor: pointer;
-}
-.block-detail-hash:hover {
-  color: #06aaf9;
-  font-weight: bold;
-}
 </style>

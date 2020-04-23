@@ -1,44 +1,46 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import HomePage from '@/page/HomePage'
-import Blocks from '@/page/Blocks'
-import BlockDetail from '@/page/BlockDetail'
-import Transactions from '@/page/Transactions'
-import TransactionDetail from '@/page/TransactionDetail'
-import WalletDetail from '@/page/WalletDetail'
-Vue.use(Router)
+window.Vue.use(window.VueRouter)
 
-export default new Router({
+export default new window.VueRouter({
   routes: [
     {
       path: '/',
       name: 'HomePage',
-      component: HomePage
+      component: (resolve) => require(['@/page/HomePage'], resolve)
     },
     {
       path: '/block',
       name: 'Blocks',
-      component: Blocks
+      component: (resolve) => require(['@/page/Blocks'], resolve)
     },
     {
       path: '/blockDetail',
       name: 'BlockDetail',
-      component: BlockDetail
+      component: (resolve) => require(['@/page/BlockDetail'], resolve)
     },
     {
       path: '/trade',
       name: 'Transactions',
-      component: Transactions
+      component: (resolve) => require(['@/page/Transactions'], resolve)
     },
     {
       path: '/tradeDetail',
       name: 'TransactionDetail',
-      component: TransactionDetail
+      component: (resolve) => require(['@/page/TransactionDetail'], resolve)
     },
     {
       path: '/walletDetail',
       name: 'WalletDetail',
-      component: WalletDetail
+      component: (resolve) => require(['@/page/WalletDetail'], resolve)
+    },
+    {
+      path: '/ERC20',
+      name: 'ERC20',
+      component: (resolve) => require(['@/page/ERC20'], resolve)
+    },
+    {
+      path: '/ERC20Detail',
+      name: 'ERC20Detail',
+      component: (resolve) => require(['@/page/ERC20Detail'], resolve)
     }
   ]
 })

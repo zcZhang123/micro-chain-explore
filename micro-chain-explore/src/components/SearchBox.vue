@@ -1,14 +1,18 @@
 <template>
   <div class="search-box">
-    <el-input size="medium" v-model="addressOrHash" placeholder="请输入地址/哈希"></el-input>
-    <el-button type="primary" size="medium" icon="el-icon-search" @click="search">搜索</el-button>
+    <el-input
+      size="medium"
+      v-model="addressOrHash"
+      @keyup.enter.native="search"
+      :placeholder="$t('message.search')"
+    ></el-input>
+    <el-button type="primary" size="medium" icon="el-icon-search" @click="search"></el-button>
   </div>
 </template>
 
 <script>
 import { getHashType } from "../js/request";
-var Chain3 = require("chain3");
-var chain3 = new Chain3();
+import { chain3 } from "../js/utils";
 export default {
   name: "SearchBox",
   data() {
@@ -18,6 +22,9 @@ export default {
   },
   methods: {
     async search() {
+      if (!this.addressOrHash) {
+        return;
+      }
       let isAddress = chain3.isAddress(this.addressOrHash);
       if (isAddress) {
         let url =
@@ -37,15 +44,12 @@ export default {
             `/#/tradeDetail/?hash=${this.addressOrHash}`;
           window.open(url, "_blank");
         } else {
-          alert("请输入正确的地址/哈希");
+          this.$message.error("请输入正确的地址/哈希");
         }
       }
     }
   }
 };
 </script>
-<style>
-.search-box .el-input {
-  width: 300px !important;
-}
+<style  lang="scss" scoped>
 </style>

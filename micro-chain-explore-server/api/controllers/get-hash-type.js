@@ -20,7 +20,7 @@ module.exports = {
       if (block.length > 0) {
         type = 0
       } else {
-        let trade = await Transactions.find({ hash: hash })
+        let trade = await Transactions.find({ transaction_hash: hash })
         if (trade.length > 0) {
           type = 1
         } else {
@@ -29,7 +29,7 @@ module.exports = {
       }
       return Utils._return(ResultCode.OK_GET_HASH_TYPE, { type: type })
     } catch (error) {
-      return error
+      return this.res.serverError(error);
     }
   }
 

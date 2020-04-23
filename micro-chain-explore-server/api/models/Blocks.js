@@ -9,19 +9,22 @@ module.exports = {
   primaryKey: 'id',
 
   attributes: {
-    parent_hash: { type: 'string' },
-    hash: { type: 'string' },
-    state_root: { type: 'string' },
-    transactions_root: { type: 'string' },
-    receipts_root: { type: 'string' },
-    block_number: { type: 'number' },
-    timestamp: { type: 'number' },
     extra_data: { type: 'string' },
-    reward: { type: 'number' },
+    hash: {
+      type: 'string',
+      unique: true
+    },
     miner: { type: 'string' },
-    transactions_num: {type: 'number'},
-    random_int1: { type: 'number' },
-    random_int2: { type: 'number' }
+    number: {
+      type: 'number'
+    },
+    parent_hash: { type: 'string' },
+    receipts_root: { type: 'string' },
+    state_root: { type: 'string' },
+    timestamp: { type: 'number' },
+    transactions: { type: 'json' },
+    transactions_length: { type: 'number' },
+    transactions_root: { type: 'string' }
   },
 
 };

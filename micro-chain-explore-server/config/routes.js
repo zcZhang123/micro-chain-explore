@@ -20,16 +20,23 @@ module.exports.routes = {
   ***************************************************************************/
 
   '/': { view: 'pages/homepage' },
-  'POST /api/v1/start-synchronous-data': { action: 'start-synchronous-data' },
   'GET /api/v1/blocks/get-blocks-list': { action: 'blocks/get-blocks-list' },
   'GET /api/v1/get-hash-type': { action: 'get-hash-type' },
   'GET /api/v1/blocks/get-blocks-detail-by-hash': { action: 'blocks/get-blocks-detail-by-hash' },
   'GET /api/v1/blocks/get-blocks-detail-by-block-num': { action: 'blocks/get-blocks-detail-by-block-num' },
+  'GET /api/v1/blocks/get-blocks-trades-count': { action: 'blocks/get-blocks-trades-count' },
   'GET /api/v1/transactions/get-transactions-list': { action: 'transactions/get-transactions-list' },
   'GET /api/v1/transactions/get-transaction-detail-by-hash': { action: 'transactions/get-transaction-detail-by-hash' },
-  'GET /api/v1/get-wallet-detail-by-address': { action: 'get-wallet-detail-by-address' },
-  'GET /api/v1/get-micro-chain-info': { action: 'get-micro-chain-info' }
-
+  'GET /api/v1/transactions/get-transactions-count': { action: 'transactions/get-transactions-count' },
+  'GET /api/v1/get-trade-list-by-address': { action: 'get-trade-list-by-address' },
+  'GET /api/v1/get-asset-list-by-address': { action: 'get-asset-list-by-address' },
+  'GET /api/v1/get-micro-chain-info': { action: 'get-micro-chain-info' },
+  'POST /api/v1/get-is-erc20': { action: 'get-is-erc20' },
+  'Get /api/v1/get-erc20-info': { action: 'get-erc20-info' },
+  'GET /api/v1/erc20/get-erc20-list': { action: 'erc20/get-erc20-list' },
+  'GET /api/v1/erc20/get-erc20-detail': { action: 'erc20/get-erc20-detail' },
+  'GET /api/v1/erc20/get-erc20-holder-list': { action: 'erc20/get-erc20-holder-list' },
+  'GET /api/v1/erc20/get-erc20-trade-list': { action: 'erc20/get-erc20-trade-list' },
 
   /***************************************************************************
   *                                                                          *
@@ -41,6 +48,4 @@ module.exports.routes = {
   * not match any of those, it is matched against static assets.             *
   *                                                                          *
   ***************************************************************************/
-
-
 };

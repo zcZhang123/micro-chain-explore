@@ -1,38 +1,36 @@
 <template>
   <div id="home-page">
     <div class="home-header">
-      <Header></Header>
+      <div class="live-update-switch">
+        <span>{{this.$t("message.live")}}</span>
+        <el-switch v-model="liveUpdate" active-color="#3498db" inactive-color="#dcdfe6"></el-switch>
+      </div>
     </div>
-    <MicroChainInfo></MicroChainInfo>
-    <LatestBlock></LatestBlock>
-    <LatestTransaction></LatestTransaction>
+    <MicroChainInfo :liveUpdate="liveUpdate"></MicroChainInfo>
+    <TransactionCurve :liveUpdate="liveUpdate"></TransactionCurve>
+    <LatestBlock :liveUpdate="liveUpdate"></LatestBlock>
+    <LatestTransaction :liveUpdate="liveUpdate"></LatestTransaction>
   </div>
 </template>
 <script>
-import Header from "../components/Header";
 import MicroChainInfo from "../components/MicroChainInfo";
 import LatestBlock from "../components/LatestBlock.vue";
 import LatestTransaction from "../components/LatestTransaction.vue";
+import TransactionCurve from "../components/TransactionCurve.vue";
 export default {
   name: "HomePage",
   components: {
-    Header,
     MicroChainInfo,
     LatestBlock,
-    LatestTransaction
+    LatestTransaction,
+    TransactionCurve
   },
   data() {
-    return {};
+    return {
+      liveUpdate: false
+    };
   }
 };
 </script>
 <style  lang="scss" scoped>
-.home-header {
-  width: 100%;
-  height: 80px;
-}
-.home-search {
-  float: right;
-  margin: 60px 60px 0 0;
-}
 </style>
