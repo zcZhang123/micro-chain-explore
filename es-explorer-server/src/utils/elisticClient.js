@@ -1,5 +1,5 @@
 const elasticsearch = require('elasticsearch');
-const { config } = require('../../config/config')
+const { config } = require('../config/config')
 
 const client = new elasticsearch.Client({
     host: config.elasticsearch.url,

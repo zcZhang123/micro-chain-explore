@@ -1,6 +1,6 @@
 module.exports.config = {
     elasticsearch: {
-        url: "localhost:9200", // es连接url
+        url: "http://127.0.0.1:9200", // es连接url
         apiVersion: "7.6", // 使用api版本，与es版本对应
         log: "error"
     },
