@@ -8,7 +8,7 @@ var logger = require('./logger')
 const axios = require("axios");
 const fetch = axios.create({ headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' } });
 const url = config.microChain.scsUri
-const { getWalletCountByAddressOrToken, createElement } = require("./esUtils")
+const { getWalletCountByAddressOrToken, createElement, updateWalletByQuery } = require("./esUtils")
 
 abiDecoder.addABI(JSON.parse(config.microChain.ASM_MICRO_CHAIN_ABI));
 abiDecoder.addABI(JSON.parse(config.microChain.DAPP_BASE_ABI));
@@ -118,7 +118,6 @@ exports.addWalletFromInput = async (tx) => {
                 // 保存该钱包信息
                 var walletId = uuidv4().replace(/-/g, "");
                 await createElement("wallet", "doc", walletId, { address: address })
-                // await Wallet.create({ address: address })
             }
         }
         if (abi) {
@@ -136,11 +135,17 @@ exports.getBalance = async (address, token, decimals) => {
     let response = await fetch.post(config.microChain.scsUri, params);
     let res = Web3EthAbi.decodeParameter('uint256', response.data.result);
     let balance = new BigNumber(res).div(10 ** decimals).toNumber();
-    let count = await Wallet.count({ address: address, token: token });
+    // 根据条件查询钱包count
+    let count = await getWalletCountByAddressOrToken({ address: address, token: token });
     if (count == 0) {
-        await Wallet.create({ address: address, token: token, balance: balance });
+        // 添加钱包数据
+        // await Wallet.create({ address: address, token: token, balance: balance });
+        var walletId = uuidv4().replace(/-/g, "");
+        await createElement("wallet", "doc", walletId, { address: address, token: token, balance: balance })
     } else {
-        await Wallet.update({ address: address, token: token }).set({ token: token, balance: balance });
+        // 更新钱包数据
+        // await Wallet.update({ address: address, token: token }).set({ token: token, balance: balance });
+        await updateWalletByQuery(address, token, balance)
     }
 }
 

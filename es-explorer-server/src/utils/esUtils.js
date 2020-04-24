@@ -92,3 +92,33 @@ exports.getWalletCountByAddressOrToken = async function (address, token) {
         return { result: false, msg: error }
     }
 }
+
+/**
+ * @description 根据条件更新钱包数据
+ * 
+ */
+exports.updateWalletByQuery = async function (address, token, balance) {
+    let res = await esClient.updateByQuery({
+        index: 'wallet',
+        body: {
+            query: {
+                bool: {
+                    must: [{
+                        match: {
+                            address: address
+                        }
+                    }, {
+                        match: {
+                            token: token
+                        }
+                    }
+                    ]
+                }
+            },
+            script:{
+                lang:"painless",
+                source: "ctx._source.balance='balance'"
+            }
+        }
+    })
+}

@@ -125,7 +125,9 @@ exports.syncMicroChain = async function () {
             }
           }
           if (txInfos.length > 0) {
-            await Transactions.createEach(txInfos);
+            // 批量保存交易数据
+            // await Transactions.createEach(txInfos);
+
           }
 
           let counts = await BlocksCruve.find({ trades: txlength }).limit(1);
