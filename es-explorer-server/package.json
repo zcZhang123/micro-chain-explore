@@ -1,0 +1,26 @@
+{
+  "name": "es-explorer-server",
+  "version": "1.0.0",
+  "description": "elasticsearch explorer server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zcZhang123/micro-chain-explore.git"
+  },
+  "author": "zczhang",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zcZhang123/micro-chain-explore/issues"
+  },
+  "homepage": "https://github.com/zcZhang123/micro-chain-explore#readme",
+  "dependencies": {
+    "chain3": "^0.1.22",
+    "dateformat": "^3.0.3",
+    "elasticsearch": "^16.7.1",
+    "winston": "^2.3.1",
+    "winston-daily-rotate-file": "^1.4.6"
+  }
+}
