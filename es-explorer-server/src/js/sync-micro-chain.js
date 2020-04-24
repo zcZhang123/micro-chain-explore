@@ -1,32 +1,41 @@
-const { getBlockNumber, } = require('../utils/moacUtils')
+const uuidv4 = require('uuid/v4');
+var logger = require('./logger')
+const Chain3 = require("chain3")
+const chain3 = new Chain3();
+const { config } = require("../config/config")
+const { getBlockNumber, getBlock, getReceiptByHash, getTransactionByHash, isERC20, addWalletFromInput } = require('../utils/moacUtils')
+const { getBlockNumToES, createElement } = require('../utils/esUtils')
+
+
 exports.syncMicroChain = async function () {
   try {
     // 获取最新区块
     let blockNum = await getBlockNumber();
-    sails.log.info("最新区块为：", blockNum)
+    console.info("最新区块为：", blockNum)
     // 获取es保存区块
-    let esNum = getBlockNumToES()
+    let blockNumToDB = await getBlockNumToES()
+    console.info("es保存区块为：", blockNumToDB)
 
-    await Blocks.destroy({ number: blockNumToDB })
-    if (blockNumToDB > blockNum) {
-      await Blocks.destroy({ number: { '>': blockNum } })
-      await Transactions.destroy({ number: blockNumToDB })
-      return
-    }
+    // await Blocks.destroy({ number: blockNumToDB })
+    // if (blockNumToDB > blockNum) {
+    //   await Blocks.destroy({ number: { '>': blockNum } })
+    //   await Transactions.destroy({ number: blockNumToDB })
+    //   return
+    // }
     if (blockNumToDB < blockNum) {
       for (blockNumToDB; blockNumToDB <= blockNum; blockNumToDB++) {
-        let info = await Utils.getBlocks(blockNumToDB);
+        let info = await getBlock(blockNumToDB);
         let transactions = info.transactions;
         let txlength = transactions.length;
         let block = {
           extra_data: info.extraData,
           hash: info.hash,
           miner: info.miner,
-          number: info.number,
+          number: chain3.toDecimal(info.number),
           parent_hash: info.parentHash,
           receipts_root: info.receiptsRoot,
           state_root: info.stateRoot,
-          timestamp: info.timestamp,
+          timestamp: chain3.toDecimal(info.timestamp),
           transactions: transactions,
           transactions_length: txlength,
           transactions_root: info.transactionsRoot
@@ -36,12 +45,13 @@ exports.syncMicroChain = async function () {
           let addrSet = new Set();
           let tokenSet = new Set();
           let txs = info.transactions;
-          let timestamp = info.timestamp;
+          let timestamp = chain3.toDecimal(info.timestamp);
           for (var i = 0, length = txs.length; i < length; i++) {
-            let isSync = await Transactions.count({ transaction_hash: txs[i] })
+            // 查询是否首次同步
+            // let isSync = await Transactions.count({ transaction_hash: txs[i] })
             if (isSync == 0) {
-              let receipt = await Utils.getReceiptByHash(txs[i]);
-              let tx = await Utils.getTransaction(txs[i]);
+              let receipt = await getReceiptByHash(txs[i]);
+              let tx = await getTransactionByHash(txs[i]);
               let contractAddress;// 部署合约地址
               let status;// 交易是否成功
               let logs = [];// 交易日志
@@ -49,7 +59,7 @@ exports.syncMicroChain = async function () {
                 // ERC20判定
                 contractAddress = receipt.contractAddress;
                 if (contractAddress && contractAddress !== '0x0000000000000000000000000000000000000000') {
-                  let res = await Utils.isERC20(contractAddress)
+                  let res = await isERC20(contractAddress)
                   if (res) {
                     let erc20 = {
                       erc20: contractAddress,
@@ -59,7 +69,10 @@ exports.syncMicroChain = async function () {
                       totalSupply: res.totalSupply,
                       deployer: tx.from
                     }
-                    await ERC20.create(erc20);
+                    // 保存erc20到es
+                    var erc20Id = uuidv4().replace(/-/g, "");
+                    let erc20Res = createElement('erc20', 'doc', erc20Id, erc20)
+                    console.info("保存erc20到es，结果为：" + erc20Res)
                   }
                 }
                 status = !receipt.failed;
@@ -67,7 +80,7 @@ exports.syncMicroChain = async function () {
                 for (let i = 0, length = _logs.length; i < length; i++) {
                   let topics = _logs[i].topics;
                   let token = _logs[i].address;
-                  if (topics[0] === sails.config.custom.TRANSFER_SHA) {
+                  if (topics[0] === config.microChain.transfer_sha) {
                     addrSet.add('0x' + topics[1].slice(26));
                     addrSet.add('0x' + topics[2].slice(26));
                     tokenSet.add(token)
@@ -82,7 +95,7 @@ exports.syncMicroChain = async function () {
               }
               let txInfo = {
                 block_hash: tx.blockHash,
-                block_number: tx.blockNumber,
+                block_number: chain3.toDecimal(tx.blockNumber),
                 from: tx.from,
                 to: tx.shardingFlag === 1 || tx.shardingFlag === 2 ? tx.input.slice(0, 42) : tx.to,
                 value: Utils.chain3.fromSha(tx.value.toString()),
@@ -102,13 +115,13 @@ exports.syncMicroChain = async function () {
               }
               txInfos.push(txInfo);
               // 统计新地址
-              await Utils.addWalletFromInput(txInfo);
+              await addWalletFromInput(txInfo);
             }
           }
           for (let token of tokenSet) {
             for (let address of addrSet) {
               let decimals = await ERC20.findOne({ where: { erc20: token }, select: ['decimals'] });
-              await Utils.getBalance(address, token, decimals.decimals);
+              await getBalance(address, token, decimals.decimals);
             }
           }
           if (txInfos.length > 0) {
@@ -129,6 +142,6 @@ exports.syncMicroChain = async function () {
       }
     }
   } catch (error) {
-    sails.log.error(error)
+    logger.info(error)
   }
 }

@@ -21,6 +21,7 @@ exports.getBlockNumToES = async function () {
         let blockInfo = res.hits.hits
         return blockInfo[0]._source.number
     } catch (error) {
+        logger.info("获取保存最新区块号 Error," + error)
         return { result: false, msg: error }
     }
 }
@@ -46,6 +47,48 @@ exports.createElement = async function (index, type, id, data) {
             return { result: false, msg: "保存数据失败" }
         }
     } catch (error) {
+        logger.info("保存数据到es Error," + error)
+        return { result: false, msg: error }
+    }
+}
+
+/**
+ * @description 根据条件查询Count
+ * @param address 钱包地址
+ * @param token 
+ */
+exports.getWalletCountByAddressOrToken = async function (address, token) {
+    try {
+        var must = []
+        if (address) {
+            var addressTerm = {
+                match: {
+                    address: address
+                }
+            }
+            must.push(addressTerm)
+        }
+        if (token) {
+            var tokenTerm = {
+                match: {
+                    token: token
+                }
+            }
+            must.push(tokenTerm)
+        }
+        let res = await esClient.count({
+            index: 'wallet',
+            body: {
+                query: {
+                    bool: {
+                        must: must
+                    }
+                }
+            }
+        })
+        return res.count
+    } catch (error) {
+        logger.info("根据地址查询总数 Error," + error)
         return { result: false, msg: error }
     }
 }
