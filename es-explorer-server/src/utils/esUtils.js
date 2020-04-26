@@ -186,7 +186,28 @@ exports.getErc20Count = async function (erc20) {
         })
         return res.count
     } catch (error) {
-        logger.info("根据条件查询ERC20 Error," + error)
+        logger.info("根据条件查询ERC20 Count Error," + error)
+        return { result: false, msg: error }
+    }
+}
+
+// 根据条件查询ERC20 Data
+exports.getERC20Data = async function (erc20) {
+    try {
+        let res = await esClient.search({
+            index: "erc20",
+            body: {
+                query: {
+                    match: {
+                        erc20: erc20
+                    }
+                }
+            },
+            size: 1
+        })
+        return res.hits.hits
+    } catch (error) {
+        logger.info("根据条件查询ERC20 Data Error," + error)
         return { result: false, msg: error }
     }
 }
@@ -195,7 +216,7 @@ exports.getErc20Count = async function (erc20) {
 exports.getBlocksCurveByTxLength = async function (txLength) {
     try {
         let res = await esClient.search({
-            index: "blocksCurve",
+            index: "blocks_curve",
             body: {
                 query: {
                     match: {
@@ -216,7 +237,7 @@ exports.getBlocksCurveByTxLength = async function (txLength) {
 exports.updateBlocksCurveNum = async function (txlength) {
     try {
         let res = await esClient.updateByQuery({
-            index: 'blocksCurve',
+            index: 'blocks_curve',
             body: {
                 query: {
                     bool: {
@@ -237,6 +258,97 @@ exports.updateBlocksCurveNum = async function (txlength) {
         return res
     } catch (error) {
         logger.info("根据交易数更新BlocksCurve数据 Error,", error)
+        return { result: false, msg: error }
+    }
+}
+
+// 根据hash获取交易数
+exports.getTransactionsCountByHash = async function (hash) {
+    try {
+        var must = []
+        if (hash) {
+            var hashTerm = {
+                match: {
+                    transaction_hash: hash
+                }
+            }
+            must.push(hashTerm)
+        }
+        let res = await esClient.count({
+            index: 'transactions',
+            body: {
+                query: {
+                    bool: {
+                        must: must
+                    }
+                }
+            }
+        })
+        return res.count
+    } catch (error) {
+        logger.info("根据hash获取交易数 Error,", error)
+        return { result: false, msg: error }
+    }
+}
+
+// 根据区块号删除区块信息
+exports.deleteBlocksByNum = async function (number) {
+    try {
+        let res = await esClient.deleteByQuery({
+            index: 'blocks',
+            body: {
+                query: {
+                    term: {
+                        number: number
+                    }
+                }
+            }
+        })
+        return res
+    } catch (error) {
+        logger.info("根据区块号删除区块信息 Error,", error)
+        return { result: false, msg: error }
+    }
+}
+
+// 删除大于区块号的区块数据
+exports.deleteSomeBlocksByNum = async function (number) {
+    try {
+        let res = await esClient.deleteByQuery({
+            index: 'blocks',
+            body: {
+                query: {
+                    range: {
+                        number: {
+                            gt: number
+                        }
+                    }
+                }
+            }
+        })
+        return res
+    } catch (error) {
+        logger.info("删除大于区块号的区块数据 Error,", error)
+        return { result: false, msg: error }
+    }
+}
+
+// 根据区块号删除交易记录
+exports.deleteTransactionsByNum = async function () {
+    try {
+        let res = await esClient.deleteByQuery({
+            index: 'transactions',
+            body: {
+                query: {
+                    term: {
+                        block_number: number
+                    }
+                }
+            }
+        })
+        return res
+    } catch (error) {
+        logger.info("根据区块号删除区块信息 Error,", error)
         return { result: false, msg: error }
     }
 }

@@ -18,6 +18,7 @@
   "homepage": "https://github.com/zcZhang123/micro-chain-explore#readme",
   "dependencies": {
     "abi-decoder": "^2.3.0",
+    "bignumber.js": "^9.0.0",
     "chain3": "^0.1.22",
     "dateformat": "^3.0.3",
     "elasticsearch": "^16.7.1",

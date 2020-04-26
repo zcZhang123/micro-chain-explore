@@ -1,10 +1,10 @@
 const uuidv4 = require('uuid/v4');
-var logger = require('./logger')
+var logger = require('../utils/logger')
 const Chain3 = require("chain3")
 const chain3 = new Chain3();
 const { config } = require("../config/config")
-const { getBlockNumber, getBlock, getReceiptByHash, getTransactionByHash, isERC20, addWalletFromInput } = require('../utils/moacUtils')
-const { getBlockNumToES, createElement, createBulkElement, getBlocksCurveByTxLength, updateBlocksCurveNum } = require('../utils/esUtils')
+const { getBlockNumber, getBlock, getReceiptByHash, getTransactionByHash, isERC20, addWalletFromInput, getBalance } = require('../utils/moacUtils')
+const { getBlockNumToES, createElement, createBulkElement, getBlocksCurveByTxLength, updateBlocksCurveNum, getTransactionsCountByHash, getERC20Data, deleteBlocksByNum, deleteSomeBlocksByNum, deleteTransactionsByNum } = require('../utils/esUtils')
 
 
 exports.syncMicroChain = async function () {
@@ -16,13 +16,14 @@ exports.syncMicroChain = async function () {
     let blockNumToDB = await getBlockNumToES()
     // let blockNumToDB = 1
     console.info("es保存区块为：", blockNumToDB)
-
-    // await Blocks.destroy({ number: blockNumToDB })
-    // if (blockNumToDB > blockNum) {
-    //   await Blocks.destroy({ number: { '>': blockNum } })
-    //   await Transactions.destroy({ number: blockNumToDB })
-    //   return
-    // }
+    // 删除es保存的最新区块
+    await deleteBlocksByNum(blockNumToDB)
+    if (blockNumToDB > blockNum) {
+      // 删除大于最新区块的数据
+      await deleteSomeBlocksByNum(blockNum)
+      await deleteTransactionsByNum(blockNumToDB)
+      return
+    }
     if (blockNumToDB < blockNum) {
       for (blockNumToDB; blockNumToDB <= blockNum; blockNumToDB++) {
         let info = await getBlock(blockNumToDB);
@@ -48,8 +49,8 @@ exports.syncMicroChain = async function () {
           let txs = info.transactions;
           let timestamp = chain3.toDecimal(info.timestamp);
           for (var i = 0, length = txs.length; i < length; i++) {
-            // 查询是否首次同步
-            // let isSync = await Transactions.count({ transaction_hash: txs[i] })
+            // 查询交易数据是否首次同步
+            let isSync = await getTransactionsCountByHash(txs[i])
             if (isSync == 0) {
               let receipt = await getReceiptByHash(txs[i]);
               let tx = await getTransactionByHash(txs[i]);
@@ -99,7 +100,7 @@ exports.syncMicroChain = async function () {
                 block_number: chain3.toDecimal(tx.blockNumber),
                 from: tx.from,
                 to: tx.shardingFlag === 1 || tx.shardingFlag === 2 ? tx.input.slice(0, 42) : tx.to,
-                value: Utils.chain3.fromSha(tx.value.toString()),
+                value: chain3.fromSha(tx.value.toString()),
                 input: tx.input,
                 nonce: tx.nonce,
                 r: tx.r.toString(),
@@ -121,38 +122,33 @@ exports.syncMicroChain = async function () {
           }
           for (let token of tokenSet) {
             for (let address of addrSet) {
-              let decimals = await ERC20.findOne({ where: { erc20: token }, select: ['decimals'] });
+              let res = await getERC20Data(token)
+              let decimals = res[0]._source.decimals
               await getBalance(address, token, decimals.decimals);
             }
           }
           if (txInfos.length > 0) {
             // 批量保存交易数据
-            // await Transactions.createEach(txInfos);
             await createBulkElement('transactions', 'doc', txInfos)
           }
           // 按交易数查询BlocksCurve
           let res = await getBlocksCurveByTxLength(txlength)
-          // let counts = await BlocksCruve.find({ trades: txlength }).limit(1);
           if (res.length == 0) {
             // 不存在该交易数的数据，新建
             var blockCurveId = uuidv4().replace(/-/g, "");
-            await createElement("blocksCurve", "doc", blockCurveId, { blocks: 1, trades: txlength })
-            // await BlocksCruve.create({
-            //   blocks: 1,
-            //   trades: txlength
-            // })
+            await createElement("blocks_curve", "doc", blockCurveId, { blocks: 1, trades: txlength })
           } else {
             // 已存在该条记录，原有基础上加一
             await updateBlocksCurveNum(txlength)
-            // await BlocksCruve.update({ trades: txlength }).set({ blocks: counts[0].blocks + 1 })
           }
         }
         // 保存区块信息
-        // await Blocks.create(block);
-        await createElement("blocks", "doc", block.number, block)
+        var blockId = uuidv4().replace(/-/g, "");
+        await createElement("blocks", "doc", blockId, block)
       }
     }
+    console.info("保存数据一次结束！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！")
   } catch (error) {
-    logger.info(error)
+    console.info("ERROR", error)
   }
 }

@@ -1,6 +1,8 @@
 const { config } = require("../config/config")
 const Chain3 = require("chain3")
 const chain3 = new Chain3();
+const BigNumber = require('bignumber.js');
+const _ = require('@sailshq/lodash');
 const uuidv4 = require('uuid/v4');
 const abiDecoder = require('abi-decoder');
 const Web3EthAbi = require('web3-eth-abi');
@@ -88,7 +90,6 @@ exports.addWalletFromInput = async (tx) => {
                     abiDecoder.addABI(JSON.parse(abi));
                 } else {
                     // 查询erc20数据Count
-                    // let count = await ERC20.count({ erc20: to });
                     let count = await getErc20Count(to)
                     if (count != 1) {
                         return
@@ -119,7 +120,7 @@ exports.addWalletFromInput = async (tx) => {
             if (isHas == 0) {
                 // 保存该钱包信息
                 var walletId = uuidv4().replace(/-/g, "");
-                await createElement("wallet", "doc", walletId, { address: address })
+                await createElement("wallet", "doc", walletId, { address: address, token: "0x0000000000000000000000000000000000000000" })
             }
         }
         if (abi) {
@@ -141,12 +142,10 @@ exports.getBalance = async (address, token, decimals) => {
     let count = await getWalletCountByAddressOrToken({ address: address, token: token });
     if (count == 0) {
         // 添加钱包数据
-        // await Wallet.create({ address: address, token: token, balance: balance });
         var walletId = uuidv4().replace(/-/g, "");
         await createElement("wallet", "doc", walletId, { address: address, token: token, balance: balance })
     } else {
         // 更新钱包数据
-        // await Wallet.update({ address: address, token: token }).set({ token: token, balance: balance });
         await updateWalletByQuery(address, token, balance)
     }
 }
