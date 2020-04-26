@@ -4,7 +4,7 @@ const Chain3 = require("chain3")
 const chain3 = new Chain3();
 const { config } = require("../config/config")
 const { getBlockNumber, getBlock, getReceiptByHash, getTransactionByHash, isERC20, addWalletFromInput } = require('../utils/moacUtils')
-const { getBlockNumToES, createElement } = require('../utils/esUtils')
+const { getBlockNumToES, createElement, createBulkElement, getBlocksCurveByTxLength, updateBlocksCurveNum } = require('../utils/esUtils')
 
 
 exports.syncMicroChain = async function () {
@@ -14,6 +14,7 @@ exports.syncMicroChain = async function () {
     console.info("最新区块为：", blockNum)
     // 获取es保存区块
     let blockNumToDB = await getBlockNumToES()
+    // let blockNumToDB = 1
     console.info("es保存区块为：", blockNumToDB)
 
     // await Blocks.destroy({ number: blockNumToDB })
@@ -127,20 +128,28 @@ exports.syncMicroChain = async function () {
           if (txInfos.length > 0) {
             // 批量保存交易数据
             // await Transactions.createEach(txInfos);
-
+            await createBulkElement('transactions', 'doc', txInfos)
           }
-
-          let counts = await BlocksCruve.find({ trades: txlength }).limit(1);
-          if (counts.length == 0) {
-            await BlocksCruve.create({
-              blocks: 1,
-              trades: txlength
-            })
+          // 按交易数查询BlocksCurve
+          let res = await getBlocksCurveByTxLength(txlength)
+          // let counts = await BlocksCruve.find({ trades: txlength }).limit(1);
+          if (res.length == 0) {
+            // 不存在该交易数的数据，新建
+            var blockCurveId = uuidv4().replace(/-/g, "");
+            await createElement("blocksCurve", "doc", blockCurveId, { blocks: 1, trades: txlength })
+            // await BlocksCruve.create({
+            //   blocks: 1,
+            //   trades: txlength
+            // })
           } else {
-            await BlocksCruve.update({ trades: txlength }).set({ blocks: counts[0].blocks + 1 })
+            // 已存在该条记录，原有基础上加一
+            await updateBlocksCurveNum(txlength)
+            // await BlocksCruve.update({ trades: txlength }).set({ blocks: counts[0].blocks + 1 })
           }
         }
-        await Blocks.create(block);
+        // 保存区块信息
+        // await Blocks.create(block);
+        await createElement("blocks", "doc", block.number, block)
       }
     }
   } catch (error) {

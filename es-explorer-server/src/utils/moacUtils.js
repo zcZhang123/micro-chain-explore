@@ -8,7 +8,7 @@ var logger = require('./logger')
 const axios = require("axios");
 const fetch = axios.create({ headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' } });
 const url = config.microChain.scsUri
-const { getWalletCountByAddressOrToken, createElement, updateWalletByQuery } = require("./esUtils")
+const { getWalletCountByAddressOrToken, createElement, updateWalletByQuery, getErc20Count } = require("./esUtils")
 
 abiDecoder.addABI(JSON.parse(config.microChain.ASM_MICRO_CHAIN_ABI));
 abiDecoder.addABI(JSON.parse(config.microChain.DAPP_BASE_ABI));
@@ -87,7 +87,9 @@ exports.addWalletFromInput = async (tx) => {
                 if (abi) {
                     abiDecoder.addABI(JSON.parse(abi));
                 } else {
-                    let count = await ERC20.count({ erc20: to });
+                    // 查询erc20数据Count
+                    // let count = await ERC20.count({ erc20: to });
+                    let count = await getErc20Count(to)
                     if (count != 1) {
                         return
                     }
