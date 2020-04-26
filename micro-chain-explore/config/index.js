@@ -11,10 +11,10 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/': { // 请求的代称，写在Axios里的BaseUrl
-        target: 'http://localhost:1337',  // 真实请求URl
+        target: 'http://127.0.0.1:9200',  // 真实请求URl
         changeOrigin: true, // 允许跨域
         pathRewrite: {  // 替换，通配/api的替换成/
-          '^/api': 'http://localhost:1337'
+          '^/': 'http://127.0.0.1:9200'
         }
       }
     },
