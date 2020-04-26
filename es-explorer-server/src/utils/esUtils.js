@@ -118,6 +118,8 @@ exports.getWalletCountByAddressOrToken = async function (address, token) {
         })
         return res.count
     } catch (error) {
+        console.log("address is：", address)
+        console.log('token is：', token)
         logger.info("根据地址查询总数 Error,", error)
         return { result: false, msg: error }
     }
