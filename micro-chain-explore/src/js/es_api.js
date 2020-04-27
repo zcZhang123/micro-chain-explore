@@ -1,8 +1,9 @@
-const esClient = require('./esClient')
+import esClient from './esClient'
 const Chain3 = require("chain3")
 const chain3 = new Chain3();
 const axios = require("axios");
 const fetch = axios.create({ headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' } });
+const { disposeESData } = require('./utils')
 
 // 获取应用链信息
 export const getMicroChainInfo = async function () {
@@ -16,11 +17,7 @@ export const getMicroChainInfo = async function () {
         info.TxReward = chain3.fromSha(chain3.toDecimal(info.txReward))
         info.ViaReward = chain3.fromSha(chain3.toDecimal(info.viaReward))
     }
-    return {
-        code: '0',
-        msg: '获取子链信息成功',
-        data: info
-    }
+    return info
 }
 
 /**
@@ -33,9 +30,10 @@ export const getMicroChainInfo = async function () {
  */
 export const getBlocksList = async function (isLatest, page, seq, blockStart, blockEnd) {
     try {
-        let res;
+        let res1;
+        let count;
         if (isLatest) {
-            res = await esClient.search({
+            res1 = await esClient.search({
                 index: "blocks",
                 body: {
                     query: {
@@ -47,7 +45,9 @@ export const getBlocksList = async function (isLatest, page, seq, blockStart, bl
                 },
                 size: 6
             })
+            count = 6;
         } else {
+            var body1;
             var timestamp = {
             }
             if (blockStart) {
@@ -56,21 +56,40 @@ export const getBlocksList = async function (isLatest, page, seq, blockStart, bl
             if (blockEnd) {
                 timestamp["lte"] = blockEnd
             }
-            res = await esClient.search({
-                index: "blocks",
-                body: {
-                    range: {
-                        timestamp: timestamp
+            if (!blockStart && !blockEnd) {
+                body1 = {
+                    query: {
+                        match_all: {}
                     }
-                },
+                }
+            } else {
+                body1 = {
+                    query: {
+                        range: {
+                            timestamp: timestamp
+                        }
+                    }
+                }
+            }
+            var body2 = {
                 from: (page - 1) * seq,
                 size: seq,
                 sort: [
                     { number: "desc" }
                 ]
+            }
+            res1 = await esClient.search({
+                index: "blocks",
+                body: Object.assign(body2, body1)
             })
+            var res2 = await esClient.count({
+                index: "blocks",
+                body: body1
+            })
+            count = res2.count
         }
-        return { data: res.hits.hits }
+        let blocksList = disposeESData(res1.hits.hits)
+        return { data: blocksList, count: count }
     } catch (error) {
         console.log(error)
         return { msg: error }
@@ -124,7 +143,8 @@ export const getTransactionsList = async function (isLatest, page, seq, tradeSta
                 ]
             })
         }
-        return { data: res.hits.hits }
+        let tradeList = disposeESData(res.hits.hits)
+        return { data: tradeList }
     } catch (error) {
         console.log(error)
         return { msg: error }

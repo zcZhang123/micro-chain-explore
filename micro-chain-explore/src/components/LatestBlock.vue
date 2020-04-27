@@ -79,13 +79,11 @@ export default {
       }
       this.loadingBlock = true;
       let res = await getBlocksList(true, 0, 0);
-      console.log(res.data.length)
       if (res.data.length > 0) {
         this.LatestBlockList = res.data;
       } else {
         this.LatestBlockList = [];
       }
-      console.log(this.LatestBlockList[0])
       this.loadingBlock = false;
     },
     showAllBlock() {

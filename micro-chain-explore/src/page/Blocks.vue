@@ -141,7 +141,7 @@
 </template>
 <script>
 import Pagination from "../components/Pagination";
-import { getBlocksList } from "../js/request";
+import { getBlocksList } from "../js/es_api";
 export default {
   name: "Blocks",
   components: {

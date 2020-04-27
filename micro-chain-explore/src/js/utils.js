@@ -233,4 +233,13 @@ export const formatStatus = (status) => {
     }
 }
 
+export const disposeESData = function (data) {
+    if (Array.isArray(data) && data.length > 0) {
+        for (let i = 0, len = data.length; i < len; i++) {
+           data[i] = data[i]._source
+        }
+    }
+    return data
+}
+
 export { chain3 }
