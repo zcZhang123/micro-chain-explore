@@ -164,7 +164,7 @@ export const getBlockDetailByHash = async function (hash, page, seq) {
                     }
                 },
                 from: (page - 1) * seq,
-                size: seq,
+                size: seq
             })
             tradeList = res2.hits.hits
         }
@@ -221,7 +221,7 @@ export const getBlockDetailByBlockNum = async function (num, page, seq) {
 
 /**
  * 根据交易hash获取交易详情
- * @param hash 
+ * @param hash hash
  */
 export const getTradeDetailByHash = async function (hash) {
     try {
@@ -245,7 +245,7 @@ export const getTradeDetailByHash = async function (hash) {
 
 /**
  * 判断hash类型
- * @param hash hash 
+ * @param hash hash
  * @returns 0: 区块hash，1: 交易hash，2: 未知hash
  */
 export const getHashType = async function (hash) {
@@ -289,7 +289,7 @@ export const getHashType = async function (hash) {
 /**
  * 获取钱包地址的交易数据
  * @param address 钱包地址
- * @param tradePartner 交易对家 
+ * @param tradePartner 交易对家
  * @param tradeStart 开始时间
  * @param tradeEnd 结束时间
  * @param page 当前页数，从0开始
@@ -496,10 +496,13 @@ export const getERC20List = async function (page, seq, condition) {
                 should: [{
                     match: {
                         name: condition
-                    },
+                    }
+                }, {
                     match: {
                         erc20: condition
-                    },
+                    }
+                },
+                {
                     match: {
                         symbol: condition
                     }
@@ -608,7 +611,7 @@ export const getERC20HolderList = async function (page, seq, ERC20Address) {
             body: {
                 query: {
                     match: {
-                        token: address
+                        token: ERC20Address
                     }
                 },
                 range: {
@@ -628,7 +631,7 @@ export const getERC20HolderList = async function (page, seq, ERC20Address) {
             body: {
                 query: {
                     match: {
-                        token: address
+                        token: ERC20Address
                     }
                 },
                 range: {
@@ -658,7 +661,7 @@ export const getERC20Info = async function (address) {
             body: {
                 query: {
                     match: {
-                        erc20: ERC20Address
+                        erc20: address
                     }
                 }
             }
@@ -670,4 +673,3 @@ export const getERC20Info = async function (address) {
         return { msg: error }
     }
 }
-

@@ -111,7 +111,7 @@
   </section>
 </template>
 <script>
-import { getMicroChainInfo } from "../js/request";
+import { getMicroChainInfo } from "../js/es_api";
 import { getTotalOperation, getFlushStatus } from "../js/utils";
 export default {
   name: "MicroChainInfo",
