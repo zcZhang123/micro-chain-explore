@@ -1,4 +1,4 @@
-import esClient from './esClient'
+const esClient = require('./esClient')
 const Chain3 = require("chain3")
 const chain3 = new Chain3();
 const axios = require("axios");
@@ -25,51 +25,439 @@ export const getMicroChainInfo = async function () {
 
 /**
  * @description 获取区块信息
- * @param isLatest 获取区块数据，true:首页数据，返回6条；false:获取指定区块数据
+ * @param isLatest 是否是首页数据，true:首页数据，返回6条；false:获取指定区块数据
  * @param page     当前页数，从0开始
  * @param seq   每页显示条数
- * @param blockStart 指定开始区块号
- * @param blockEnd 指定结束区块号
+ * @param blockStart 指定开始时间
+ * @param blockEnd 指定结束时间
  */
 export const getBlocksList = async function (isLatest, page, seq, blockStart, blockEnd) {
-    let res;
-    if (isLatest) {
-        res = await esClient.search({
-            index: "blocks",
+    try {
+        let res;
+        if (isLatest) {
+            res = await esClient.search({
+                index: "blocks",
+                body: {
+                    query: {
+                        match_all: {}
+                    },
+                    sort: [
+                        { number: 'desc' }
+                    ]
+                },
+                size: 6
+            })
+        } else {
+            var timestamp = {
+            }
+            if (blockStart) {
+                timestamp["gte"] = blockStart
+            }
+            if (blockEnd) {
+                timestamp["lte"] = blockEnd
+            }
+            res = await esClient.search({
+                index: "blocks",
+                body: {
+                    range: {
+                        timestamp: timestamp
+                    }
+                },
+                from: (page - 1) * seq,
+                size: seq,
+                sort: [
+                    { number: "desc" }
+                ]
+            })
+        }
+        return { data: res.hits.hits }
+    } catch (error) {
+        console.log(error)
+        return { msg: error }
+    }
+}
+
+/**
+ * @description 获取交易信息
+ * @param isLatest  是否是首页数据，true:首页数据，返回6条；false:获取指定交易数据
+ * @param page     当前页数，从0开始
+ * @param seq   每页显示条数
+ * @param blockStart 指定开始时间
+ * @param blockEnd 指定结束时间
+ */
+export const getTransactionsList = async function (isLatest, page, seq, tradeStart, tradeEnd) {
+    try {
+        let res;
+        if (isLatest) {
+            res = await esClient.search({
+                index: "transactions",
+                body: {
+                    query: {
+                        match_all: {}
+                    },
+                    sort: [
+                        { time: 'desc' }
+                    ]
+                },
+                size: 6
+            })
+        } else {
+            var time = {
+            }
+            if (tradeStart) {
+                time["gte"] = tradeStart
+            }
+            if (tradeEnd) {
+                time["lte"] = tradeEnd
+            }
+            res = await esClient.search({
+                index: "transactions",
+                body: {
+                    range: {
+                        time: time
+                    }
+                },
+                from: (page - 1) * seq,
+                size: seq,
+                sort: [
+                    { time: "desc" }
+                ]
+            })
+        }
+        return { data: res.hits.hits }
+    } catch (error) {
+        console.log(error)
+        return { msg: error }
+    }
+}
+
+/**
+ * 根据区块hash获取区块信息（包括交易信息）
+ * @param hash 区块hash
+ * @param page 当前页数，从0开始
+ * @param seq 每页显示条数
+ */
+export const getBlockDetailByHash = async function (hash, page, seq) {
+    try {
+        let res1 = await esClient.search({
+            index: 'blocks',
             body: {
                 query: {
-                    match_all: {}
-                },
-                sort: [
-                    { number: 'desc' }
-                ]
-            },
-            size: 6
+                    match: {
+                        hash: hash
+                    }
+                }
+            }
         })
-    } else {
-        var number = {
-            gte: blockStart,
-            lte: blockEnd
+        let detail = res1.hits.hits[0]._source
+        console.log(detail)
+        let tradeList = [];
+        let count = detail.transactions_length;
+        if (detail && detail.transactions_length > 0) {
+            let res2 = await esClient.search({
+                index: 'transactions',
+                body: {
+                    query: {
+                        match: {
+                            block_hash: hash
+                        }
+                    }
+                },
+                from: (page - 1) * seq,
+                size: seq,
+            })
+            tradeList = res2.hits.hits
         }
-        if (blockStart) {
-            number["gte"] = blockStart
-        }
-        if (blockEnd) {
-            number["lte"] = blockEnd
-        }
-        res = await esClient.search({
-            index: "blocks",
+        return { data: { detail: detail, tradeList: tradeList, count: count } }
+    } catch (error) {
+        console.log(error)
+        return { msg: error }
+    }
+}
+
+/**
+ * 根据区块号获取区块信息（包括交易信息）
+ * @param num 区块号
+ * @param page 当前页数，从0开始
+ * @param seq 每页显示条数
+ */
+export const getBlockDetailByBlockNum = async function (num, page, seq) {
+    try {
+        let res1 = await esClient.search({
+            index: 'blocks',
             body: {
+                query: {
+                    match: {
+                        number: num
+                    }
+                }
+            }
+        })
+        let detail = res1.hits.hits[0]._source
+        console.log(detail)
+        let tradeList = [];
+        let count = detail.transactions_length;
+        if (detail && detail.transactions_length > 0) {
+            let res2 = await esClient.search({
+                index: 'transactions',
+                body: {
+                    query: {
+                        match: {
+                            block_number: num
+                        }
+                    }
+                },
+                from: (page - 1) * seq,
+                size: seq,
+            })
+            tradeList = res2.hits.hits
+        }
+        return { data: { detail: detail, tradeList: tradeList, count: count } }
+    } catch (error) {
+        console.log(error)
+        return { msg: error }
+    }
+}
+
+/**
+ * 根据交易hash获取交易详情
+ * @param hash 
+ */
+export const getTradeDetailByHash = async function (hash) {
+    try {
+        let res1 = await esClient.search({
+            index: 'transactions',
+            body: {
+                query: {
+                    match: {
+                        transaction_hash: hash
+                    }
+                }
+            }
+        })
+        let detail = res1.hits.hits[0]._source
+        return { data: detail }
+    } catch (error) {
+        console.log(error)
+        return { msg: error }
+    }
+}
+
+/**
+ * 判断hash类型
+ * @param hash hash 
+ * @returns 0: 区块hash，1: 交易hash，2: 未知hash
+ */
+export const getHashType = async function (hash) {
+    try {
+        let type = 0;
+        let res1 = await esClient.search({
+            index: 'blocks',
+            body: {
+                query: {
+                    match: {
+                        hash: hash
+                    }
+                }
+            }
+        })
+        if (res1.hits.hits.length > 0) {
+            type = 0
+        }
+        let res2 = await esClient.search({
+            index: 'transactions',
+            body: {
+                query: {
+                    match: {
+                        transaction_hash: hash
+                    }
+                }
+            }
+        })
+        if (res2.hits.hits.length > 0) {
+            type = 1
+        } else {
+            type = 2
+        }
+        return { data: { type: type } }
+    } catch (error) {
+        console.log(error)
+        return { msg: error }
+    }
+}
+
+/**
+ * 获取钱包地址的交易数据
+ * @param address 钱包地址
+ * @param tradePartner 交易对家 
+ * @param tradeStart 开始时间
+ * @param tradeEnd 结束时间
+ * @param page 当前页数，从0开始
+ * @param seq 每页显示条数
+ */
+export const getTrandeListByAddress = async function (address, tradePartner, tradeStart, tradeEnd, page, seq) {
+    try {
+        let should = [{
+            match: {
+                from: address
+            }
+        }, {
+            match: {
+                to: address
+            }
+        }]
+        if (tradePartner) {
+            should = [{
+                match: {
+                    from: address,
+                    to: tradePartner
+                }
+            }, {
+                match: {
+                    from: tradePartner,
+                    to: address
+                }
+            }]
+        }
+        var time = {
+            lte: ""
+        }
+        if (tradeStart) {
+            time["gte"] = tradeStart
+        }
+        if (tradeEnd) {
+            time["lte"] = tradeStart
+        }
+        let res1 = await esClient.search({
+            index: "transactions",
+            body: {
+                bool: {
+                    should: should
+                },
                 range: {
-                    number: number
+                    time: time
                 }
             },
             from: (page - 1) * seq,
-            size: seq,
-            sort: [
-                { number: "desc" }
-            ]
+            size: seq
         })
+        let trade = res1.hits.hits
+        let res2 = await esClient.count({
+            index: "transactions",
+            body: {
+                bool: {
+                    should: should
+                },
+                range: {
+                    time: time
+                }
+            }
+        })
+        let count = res2.count
+        return { data: { trade: trade, count: count } }
+    } catch (error) {
+        console.log(error)
+        return { msg: error }
     }
-    return { data: res.hits.hits }
 }
+
+/**
+ * 获取钱包地址资产
+ * @param address 钱包地址
+ * @param page 当前页数，从0开始
+ * @param seq 每页显示条数
+ */
+export const getAssetListByAddress = async function (address, page, seq) {
+    try {
+        let res1 = await esClient.search({
+            index: "wallet",
+            body: {
+                query: {
+                    match: {
+                        address: address
+                    }
+                },
+                range: {
+                    balance: {
+                        gt: 0
+                    }
+                }
+            },
+            from: (page - 1) * seq,
+            size: seq
+        })
+        let assetList = res1.hits.hits
+        let res2 = await esClient.count({
+            index: "wallet",
+            body: {
+                query: {
+                    match: {
+                        address: address
+                    },
+                    range: {
+                        balance: {
+                            gt: 0
+                        }
+                    }
+                }
+            }
+        })
+        let count = res2.count
+        if (assetList.length > 0) {
+            for (let i = 0, len = assetList.length; i < len; i++) {
+                let res3 = await esClient.search({
+                    index: "erc20",
+                    body: {
+                        query: {
+                            match: {
+                                erc20: assetList[i]._source.token
+                            }
+                        }
+                    }
+                })
+                let token = res3.hits.hits[0]._source
+                assetList[i].push(token)
+            }
+        }
+        return { data: { data: assetList, count: count } }
+    } catch (error) {
+        console.log(error)
+        return { msg: error }
+    }
+}
+
+// 获取交易数量曲线数据 未完成
+export const getTransactionsCount = async function () {
+    try {
+        let transactionsList = []
+        return { data: { data: transactionsList } }
+    } catch (error) {
+        console.log(error)
+        return { msg: error }
+    }
+}
+
+// 获取交易区块数统计信息
+export const getBlocksTradesCount = async function () {
+    try {
+        let res = await esClient.search({
+            index: "blocks_cruve",
+            body: {
+                query: {
+                    match_all: {}
+                }
+            }
+        })
+        let blockList = res.hits.hits;
+        return { data: { data: blockList } }
+    } catch (error) {
+        console.log(error)
+        return { msg: error }
+    }
+}
+
+// 判断是否是erc20
+export const getIsErc20 = async function() {
+
+}
+
