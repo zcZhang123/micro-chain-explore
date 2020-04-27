@@ -132,6 +132,9 @@ exports.addWalletFromInput = async (tx) => {
 };
 
 exports.getBalance = async (address, token, decimals) => {
+    if (!decimals) {
+        decimals = 18
+    }
     var data = chain3.sha3('balanceOf(address)').substr(0, 10)
         + chain3.encodeParams(['address'], [address]);
     let params = JSON.stringify({ "jsonrpc": "2.0", "method": "scs_directCall", "params": [{ "to": config.microChain.microChain, "dappAddr": token, "data": data }], "id": Math.floor((Math.random() * 100) + 1) })
@@ -139,7 +142,7 @@ exports.getBalance = async (address, token, decimals) => {
     let res = Web3EthAbi.decodeParameter('uint256', response.data.result);
     let balance = new BigNumber(res).div(10 ** decimals).toNumber();
     // 根据条件查询钱包count
-    let count = await getWalletCountByAddressOrToken({ address: address, token: token });
+    let count = await getWalletCountByAddressOrToken(address, token);
     if (count == 0) {
         // 添加钱包数据
         var walletId = uuidv4().replace(/-/g, "");

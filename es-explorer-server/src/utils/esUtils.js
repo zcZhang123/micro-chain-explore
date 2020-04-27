@@ -74,7 +74,6 @@ exports.createBulkElement = async function (index, type, datas) {
             bulkBody.push(datas[i])
         }
         let res = await esClient.bulk({ body: bulkBody })
-        logger.info("批量保存数据到es,", res)
         return res
     } catch (error) {
         logger.info("批量保存数据到es Error,", error)
@@ -118,8 +117,6 @@ exports.getWalletCountByAddressOrToken = async function (address, token) {
         })
         return res.count
     } catch (error) {
-        console.log("address is：", address)
-        console.log('token is：', token)
         logger.info("根据地址查询总数 Error,", error)
         return { result: false, msg: error }
     }
@@ -256,7 +253,6 @@ exports.updateBlocksCurveNum = async function (txlength) {
                 }
             }
         })
-        logger.info("根据交易数更新BlocksCurve数据,", res)
         return res
     } catch (error) {
         logger.info("根据交易数更新BlocksCurve数据 Error,", error)
@@ -336,7 +332,7 @@ exports.deleteSomeBlocksByNum = async function (number) {
 }
 
 // 根据区块号删除交易记录
-exports.deleteTransactionsByNum = async function () {
+exports.deleteTransactionsByNum = async function (number) {
     try {
         let res = await esClient.deleteByQuery({
             index: 'transactions',
