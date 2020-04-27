@@ -208,7 +208,7 @@ export const getBlockDetailByBlockNum = async function (num, page, seq) {
                     }
                 },
                 from: (page - 1) * seq,
-                size: seq,
+                size: seq
             })
             tradeList = res2.hits.hits
         }
@@ -457,7 +457,217 @@ export const getBlocksTradesCount = async function () {
 }
 
 // 判断是否是erc20
-export const getIsErc20 = async function() {
+export const getIsErc20 = async function (address) {
+    try {
+        let isERC20;
+        let res = await esClient.count({
+            index: "erc20",
+            body: {
+                query: {
+                    match: {
+                        erc20: address
+                    }
+                }
+            }
+        })
+        if (res.count > 0) {
+            isERC20 = true
+        } else {
+            isERC20 = false
+        }
+        return { data: isERC20 }
+    } catch (error) {
+        console.log(error)
+        return { msg: error }
+    }
+}
 
+/**
+ * 获取erc20列表
+ * @param page 当前页数，从0开始
+ * @param seq 每页显示条数
+ * @param condition token地址/ token代称 / token名称
+ */
+export const getERC20List = async function (page, seq, condition) {
+    try {
+        let bool = {};
+        if (condition) {
+            bool = {
+                should: [{
+                    match: {
+                        name: condition
+                    },
+                    match: {
+                        erc20: condition
+                    },
+                    match: {
+                        symbol: condition
+                    }
+                }]
+            }
+        }
+        let res1 = await esClient.search({
+            index: "erc20",
+            body: {
+                bool: bool
+            },
+            from: (page - 1) * seq,
+            size: seq
+        })
+        let erc20List = res1.hits.hits
+        let res2 = await esClient.count({
+            index: "erc20",
+            body: {
+                bool: bool
+            }
+        })
+        let count = res2.count
+        return { data: { data: erc20List, count: count } }
+    } catch (error) {
+        console.log(error)
+        return { msg: error }
+    }
+}
+
+/**
+ * 获取erc20详细信息
+ * @param ERC20Address erc20 地址
+ */
+export const getERC20Detail = async function (ERC20Address) {
+    try {
+        let res = await esClient.search({
+            index: "erc20",
+            body: {
+                query: {
+                    match: {
+                        erc20: ERC20Address
+                    }
+                }
+            }
+        })
+        let erc20Data = res.hits.hits
+        return { data: { data: erc20Data } }
+    } catch (error) {
+        console.log(error)
+        return { msg: error }
+    }
+}
+
+/**
+ * 获取erc20交易列表
+ * @param page 当前页数，从0开始
+ * @param seq 每页显示条数
+ * @param ERC20Address erc20 地址
+ */
+export const getERC20TradeList = async function (page, seq, ERC20Address) {
+    try {
+        let res1 = await esClient.search({
+            index: "transactions",
+            body: {
+                query: {
+                    match: {
+                        to: ERC20Address
+                    }
+                }
+            },
+            from: (page - 1) * seq,
+            size: seq,
+            sort: [
+                { "block_number": "desc" }
+            ]
+        })
+        let tradeList = res1.hits.hits
+        let res2 = await esClient.count({
+            index: "transactions",
+            body: {
+                query: {
+                    match: {
+                        to: ERC20Address
+                    }
+                }
+            }
+        })
+        let tradeCount = res2.count
+        return { data: { data: tradeList, count: tradeCount } }
+    } catch (error) {
+        console.log(error)
+        return { msg: error }
+    }
+}
+
+/**
+ * 获取erc20持有人列表
+ * @param page 当前页数，从0开始
+ * @param seq 每页显示条数
+ * @param ERC20Address erc20 地址
+ */
+export const getERC20HolderList = async function (page, seq, ERC20Address) {
+    try {
+        let res1 = await esClient.search({
+            index: "wallet",
+            body: {
+                query: {
+                    match: {
+                        token: address
+                    }
+                },
+                range: {
+                    balance: {
+                        gt: 0
+                    }
+                }
+            },
+            from: (page - 1) * seq,
+            size: seq,
+            sort: [
+                { "balance": "desc" }
+            ]
+        })
+        let res2 = await esClient.count({
+            index: "wallet",
+            body: {
+                query: {
+                    match: {
+                        token: address
+                    }
+                },
+                range: {
+                    balance: {
+                        gt: 0
+                    }
+                }
+            }
+        })
+        let holderList = res1.hits.hits
+        let count = res2.count
+        return { data: { data: holderList, count: count } }
+    } catch (error) {
+        console.log(error)
+        return { msg: error }
+    }
+}
+
+/**
+ * 获取erc20详细信息
+ * @param address erc20 地址
+ */
+export const getERC20Info = async function (address) {
+    try {
+        let res = await esClient.search({
+            index: "erc20",
+            body: {
+                query: {
+                    match: {
+                        erc20: ERC20Address
+                    }
+                }
+            }
+        })
+        let erc20Data = res.hits.hits
+        return { data: { info: erc20Data } }
+    } catch (error) {
+        console.log(error)
+        return { msg: error }
+    }
 }
 
