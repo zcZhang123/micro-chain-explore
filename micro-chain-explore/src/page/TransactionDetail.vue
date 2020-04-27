@@ -133,7 +133,7 @@
 </template>
 <script>
 import Clipboard from "../components/CopyToClipboard";
-import { getTradeDetailByHash } from "../js/request";
+import { getTradeDetailByHash } from "../js/es_api";
 import {
   decodeInput,
   decodeLogs,

@@ -106,9 +106,10 @@ export const getBlocksList = async function (isLatest, page, seq, blockStart, bl
  */
 export const getTransactionsList = async function (isLatest, page, seq, tradeStart, tradeEnd) {
     try {
-        let res;
+        var res1;
+        var count = 0;
         if (isLatest) {
-            res = await esClient.search({
+            res1 = await esClient.search({
                 index: "transactions",
                 body: {
                     query: {
@@ -120,7 +121,9 @@ export const getTransactionsList = async function (isLatest, page, seq, tradeSta
                 },
                 size: 6
             })
+            count = 6
         } else {
+            var body1;
             var time = {
             }
             if (tradeStart) {
@@ -129,22 +132,41 @@ export const getTransactionsList = async function (isLatest, page, seq, tradeSta
             if (tradeEnd) {
                 time["lte"] = tradeEnd
             }
-            res = await esClient.search({
-                index: "transactions",
-                body: {
-                    range: {
-                        time: time
+            if (!tradeStart && !tradeStart) {
+                body1 = {
+                    query: {
+                        match_all: {}
                     }
-                },
+                }
+            } else {
+                body1 = {
+                    query: {
+                        range: {
+                            time: time
+                        }
+                    }
+                }
+            }
+            var body2 = {
                 from: (page - 1) * seq,
                 size: seq,
                 sort: [
-                    { time: "desc" }
+                    { block_number: "desc" }
                 ]
+            }
+
+            res1 = await esClient.search({
+                index: "transactions",
+                body: Object.assign(body2, body1)
             })
+            let res2 = await esClient.count({
+                index: "transactions",
+                body: body1
+            })
+            count = res2.count
         }
-        let tradeList = disposeESData(res.hits.hits)
-        return { data: tradeList }
+        let tradeList = disposeESData(res1.hits.hits)
+        return { data: tradeList, count: count }
     } catch (error) {
         console.log(error)
         return { msg: error }
@@ -186,9 +208,9 @@ export const getBlockDetailByHash = async function (hash, page, seq) {
                 from: (page - 1) * seq,
                 size: seq
             })
-            tradeList = res2.hits.hits
+            tradeList = disposeESData(res2.hits.hits)
         }
-        return { data: { detail: detail, tradeList: tradeList, count: count } }
+        return { detail: detail, tradeList: tradeList, count: count }
     } catch (error) {
         console.log(error)
         return { msg: error }
@@ -230,9 +252,9 @@ export const getBlockDetailByBlockNum = async function (num, page, seq) {
                 from: (page - 1) * seq,
                 size: seq
             })
-            tradeList = res2.hits.hits
+            tradeList = disposeESData(res2.hits.hits)
         }
-        return { data: { detail: detail, tradeList: tradeList, count: count } }
+        return { detail: detail, tradeList: tradeList, count: count }
     } catch (error) {
         console.log(error)
         return { msg: error }
@@ -256,7 +278,7 @@ export const getTradeDetailByHash = async function (hash) {
             }
         })
         let detail = res1.hits.hits[0]._source
-        return { data: detail }
+        return detail
     } catch (error) {
         console.log(error)
         return { msg: error }
@@ -281,9 +303,6 @@ export const getHashType = async function (hash) {
                 }
             }
         })
-        if (res1.hits.hits.length > 0) {
-            type = 0
-        }
         let res2 = await esClient.search({
             index: 'transactions',
             body: {
@@ -294,12 +313,14 @@ export const getHashType = async function (hash) {
                 }
             }
         })
-        if (res2.hits.hits.length > 0) {
+        if (res1.hits.hits.length > 0) {
+            type = 0
+        } else if (res2.hits.hits.length > 0) {
             type = 1
         } else {
             type = 2
         }
-        return { data: { type: type } }
+        return type
     } catch (error) {
         console.log(error)
         return { msg: error }
@@ -315,7 +336,7 @@ export const getHashType = async function (hash) {
  * @param page 当前页数，从0开始
  * @param seq 每页显示条数
  */
-export const getTrandeListByAddress = async function (address, tradePartner, tradeStart, tradeEnd, page, seq) {
+export const getTradeListByAddress = async function (address, tradePartner, tradeStart, tradeEnd, page, seq) {
     try {
         let should = [{
             match: {
@@ -351,30 +372,34 @@ export const getTrandeListByAddress = async function (address, tradePartner, tra
         let res1 = await esClient.search({
             index: "transactions",
             body: {
-                bool: {
-                    should: should
+                query: {
+                    bool: {
+                        should: should
+                    },
+                    range: {
+                        time: time
+                    }
                 },
-                range: {
-                    time: time
-                }
-            },
-            from: (page - 1) * seq,
-            size: seq
+                from: (page - 1) * seq,
+                size: seq
+            }
         })
-        let trade = res1.hits.hits
+        let trade = disposeESData(res1.hits.hits)
         let res2 = await esClient.count({
             index: "transactions",
             body: {
-                bool: {
-                    should: should
-                },
-                range: {
-                    time: time
+                query: {
+                    bool: {
+                        should: should
+                    },
+                    range: {
+                        time: time
+                    }
                 }
             }
         })
         let count = res2.count
-        return { data: { trade: trade, count: count } }
+        return { trade: trade, count: count }
     } catch (error) {
         console.log(error)
         return { msg: error }
@@ -393,31 +418,47 @@ export const getAssetListByAddress = async function (address, page, seq) {
             index: "wallet",
             body: {
                 query: {
-                    match: {
-                        address: address
+                    bool: {
+                        filter: [
+                            {
+                                match: {
+                                    address: address
+                                }
+                            },
+                            {
+                                range: {
+                                    balance: {
+                                        gt: 0
+                                    }
+                                }
+                            }
+                        ]
                     }
                 },
-                range: {
-                    balance: {
-                        gt: 0
-                    }
-                }
-            },
-            from: (page - 1) * seq,
-            size: seq
+                from: (page - 1) * seq,
+                size: seq
+            }
         })
-        let assetList = res1.hits.hits
+        let assetList = disposeESData(res1.hits.hits)
         let res2 = await esClient.count({
             index: "wallet",
             body: {
                 query: {
-                    match: {
-                        address: address
-                    },
-                    range: {
-                        balance: {
-                            gt: 0
-                        }
+                    bool: {
+                        filter: [
+                            {
+                                match: {
+                                    address: address
+                                }
+                            },
+                            {
+                                range: {
+                                    balance: {
+                                        gt: 0
+                                    }
+                                }
+                            }
+                        ]
                     }
                 }
             }
@@ -430,16 +471,16 @@ export const getAssetListByAddress = async function (address, page, seq) {
                     body: {
                         query: {
                             match: {
-                                erc20: assetList[i]._source.token
+                                erc20: assetList[i].token
                             }
                         }
                     }
                 })
                 let token = res3.hits.hits[0]._source
-                assetList[i].push(token)
+                assetList[i].ERC20 = token
             }
         }
-        return { data: { data: assetList, count: count } }
+        return { data: assetList, count: count }
     } catch (error) {
         console.log(error)
         return { msg: error }

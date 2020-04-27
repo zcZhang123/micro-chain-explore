@@ -108,7 +108,7 @@
   </section>
 </template>
 <script>
-import { getTransactionsList } from "../js/request";
+import { getTransactionsList } from "../js/es_api";
 import { formatStatus, formatShadingFlag } from "../js/utils";
 export default {
   name: "LatestTransaction",

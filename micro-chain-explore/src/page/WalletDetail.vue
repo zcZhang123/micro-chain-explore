@@ -241,7 +241,7 @@
 <script>
 import Clipboard from "../components/CopyToClipboard";
 import Pagination from "../components/Pagination";
-import { getTradeListByAddress, getAssetListByAddress } from "../js/request";
+import { getTradeListByAddress, getAssetListByAddress } from "../js/es_api";
 import { formatStatus, formatShadingFlag, chain3 } from "../js/utils";
 export default {
   name: "WalletDetail",

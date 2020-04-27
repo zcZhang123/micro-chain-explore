@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import { getHashType } from "../js/request";
+import { getHashType } from "../js/es_api";
 import { chain3 } from "../js/utils";
 export default {
   name: "SearchBox",

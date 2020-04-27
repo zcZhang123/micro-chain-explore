@@ -153,7 +153,7 @@
 <script>
 import Clipboard from "../components/CopyToClipboard";
 import Pagination from "../components/Pagination";
-import { getBlockDetailByHash, getBlockDetailByBlockNum } from "../js/request";
+import { getBlockDetailByHash, getBlockDetailByBlockNum } from "../js/es_api";
 import { formatStatus, formatShadingFlag } from "../js/utils";
 export default {
   name: "BlockDetail",
