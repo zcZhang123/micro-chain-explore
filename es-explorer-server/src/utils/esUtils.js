@@ -22,7 +22,7 @@ exports.getBlockNumToES = async function () {
         let blockInfo = res.hits.hits
         return blockInfo[0]._source.number
     } catch (error) {
-        logger.info("获取保存最新区块号 Error,", error)
+        logger.error("获取保存最新区块号 Error,", error)
         return { result: false, msg: error }
     }
 }
@@ -48,7 +48,7 @@ exports.createElement = async function (index, type, id, data) {
             return { result: false, msg: "保存数据失败" }
         }
     } catch (error) {
-        logger.info("保存数据到es Error,", error)
+        logger.error("保存数据到es Error,", error)
         return { result: false, msg: error }
     }
 }
@@ -76,7 +76,7 @@ exports.createBulkElement = async function (index, type, datas) {
         let res = await esClient.bulk({ body: bulkBody })
         return res
     } catch (error) {
-        logger.info("批量保存数据到es Error,", error)
+        logger.error("批量保存数据到es Error,", error)
         return { result: false, msg: error }
     }
 }
@@ -117,7 +117,7 @@ exports.getWalletCountByAddressOrToken = async function (address, token) {
         })
         return res.count
     } catch (error) {
-        logger.info("根据地址查询总数 Error,", error)
+        logger.error("根据地址查询总数 Error,", error)
         return { result: false, msg: error }
     }
 }
@@ -153,7 +153,8 @@ exports.updateWalletByQuery = async function (address, token, balance) {
         })
         return res
     } catch (error) {
-        logger.info("根据条件更新钱包数据 Error,", error)
+        logger.info("参数address：" + address, ",   token：" + token + ",   balance：" + balance)
+        logger.error("根据条件更新钱包数据 Error,", error)
         return { result: false, msg: error }
     }
 }
@@ -185,7 +186,7 @@ exports.getErc20Count = async function (erc20) {
         })
         return res.count
     } catch (error) {
-        logger.info("根据条件查询ERC20 Count Error," + error)
+        logger.error("根据条件查询ERC20 Count Error," + error)
         return { result: false, msg: error }
     }
 }
@@ -206,7 +207,7 @@ exports.getERC20Data = async function (erc20) {
         })
         return res.hits.hits
     } catch (error) {
-        logger.info("根据条件查询ERC20 Data Error," + error)
+        logger.error("根据条件查询ERC20 Data Error," + error)
         return { result: false, msg: error }
     }
 }
@@ -227,7 +228,7 @@ exports.getBlocksCurveByTxLength = async function (txLength) {
         })
         return res.hits.hits
     } catch (error) {
-        logger.info("根据交易数查询BlocksCurve Error,", error)
+        logger.error("根据交易数查询BlocksCurve Error,", error)
         return { result: false, msg: error }
     }
 }
@@ -255,7 +256,8 @@ exports.updateBlocksCurveNum = async function (txlength) {
         })
         return res
     } catch (error) {
-        logger.info("根据交易数更新BlocksCurve数据 Error,", error)
+        logger.info("参数为：", txlength)
+        logger.error("根据交易数更新BlocksCurve数据 Error,", error)
         return { result: false, msg: error }
     }
 }
@@ -284,7 +286,7 @@ exports.getTransactionsCountByHash = async function (hash) {
         })
         return res.count
     } catch (error) {
-        logger.info("根据hash获取交易数 Error,", error)
+        logger.error("根据hash获取交易数 Error,", error)
         return { result: false, msg: error }
     }
 }
@@ -304,7 +306,7 @@ exports.deleteBlocksByNum = async function (number) {
         })
         return res
     } catch (error) {
-        logger.info("根据区块号删除区块信息 Error,", error)
+        logger.error("根据区块号删除区块信息 Error,", error)
         return { result: false, msg: error }
     }
 }
@@ -326,7 +328,7 @@ exports.deleteSomeBlocksByNum = async function (number) {
         })
         return res
     } catch (error) {
-        logger.info("删除大于区块号的区块数据 Error,", error)
+        logger.error("删除大于区块号的区块数据 Error,", error)
         return { result: false, msg: error }
     }
 }
@@ -346,7 +348,7 @@ exports.deleteTransactionsByNum = async function (number) {
         })
         return res
     } catch (error) {
-        logger.info("根据区块号删除区块信息 Error,", error)
+        logger.error("根据区块号删除区块信息 Error,", error)
         return { result: false, msg: error }
     }
 }
