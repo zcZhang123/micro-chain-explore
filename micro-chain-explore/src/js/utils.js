@@ -1,4 +1,4 @@
-import { getERC20Info } from './request'
+import { getERC20Info } from './es_api'
 const abiDecoder = require('abi-decoder');
 const chain3 = require('../../node_modules/chain3/lib//utils/utils');
 const _sha3 = require('../../node_modules/chain3/lib/utils/sha3');

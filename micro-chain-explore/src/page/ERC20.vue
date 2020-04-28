@@ -104,7 +104,7 @@
 </template>
 <script>
 import Pagination from "../components/Pagination";
-import { getERC20List } from "../js/request";
+import { getERC20List } from "../js/es_api";
 export default {
   name: "ERC20",
   components: {

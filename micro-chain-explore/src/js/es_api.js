@@ -537,15 +537,19 @@ export const getTransactionsCount = async function () {
 export const getBlocksTradesCount = async function () {
     try {
         let res = await esClient.search({
-            index: "blocks_cruve",
+            index: "blocks_curve",
             body: {
                 query: {
                     match_all: {}
-                }
+                },
+                sort: [
+                    { trades: 'asc' }
+                ],
+                size: 1000
             }
         })
-        let blockList = res.hits.hits;
-        return { data: { data: blockList } }
+        let blockList = disposeESData(res.hits.hits);
+        return { data: blockList }
     } catch (error) {
         console.log(error)
         return { msg: error }
@@ -586,42 +590,38 @@ export const getIsErc20 = async function (address) {
  */
 export const getERC20List = async function (page, seq, condition) {
     try {
-        let bool = {};
+        let body = {
+            query: {
+                match_all: {}
+            }
+        };
         if (condition) {
-            bool = {
-                should: [{
-                    match: {
-                        name: condition
+            body = {
+                query: {
+                    bool: {
+                        should: [{
+                            multi_match: {
+                                query: condition,
+                                fields: ["name", "erc20", "symbol"]
+                            }
+                        }]
                     }
-                }, {
-                    match: {
-                        erc20: condition
-                    }
-                },
-                {
-                    match: {
-                        symbol: condition
-                    }
-                }]
+                }
             }
         }
         let res1 = await esClient.search({
             index: "erc20",
-            body: {
-                bool: bool
-            },
+            body: body,
             from: (page - 1) * seq,
             size: seq
         })
-        let erc20List = res1.hits.hits
+        let erc20List = disposeESData(res1.hits.hits)
         let res2 = await esClient.count({
             index: "erc20",
-            body: {
-                bool: bool
-            }
+            body: body
         })
         let count = res2.count
-        return { data: { data: erc20List, count: count } }
+        return { data: erc20List, count: count }
     } catch (error) {
         console.log(error)
         return { msg: error }
@@ -632,7 +632,7 @@ export const getERC20List = async function (page, seq, condition) {
  * 获取erc20详细信息
  * @param ERC20Address erc20 地址
  */
-export const getERC20Detail = async function (ERC20Address) {
+export const getERC20DetailByAddress = async function (ERC20Address) {
     try {
         let res = await esClient.search({
             index: "erc20",
@@ -644,8 +644,8 @@ export const getERC20Detail = async function (ERC20Address) {
                 }
             }
         })
-        let erc20Data = res.hits.hits
-        return { data: { data: erc20Data } }
+        let erc20Data = res.hits.hits[0]._source
+        return { data: erc20Data }
     } catch (error) {
         console.log(error)
         return { msg: error }
@@ -667,15 +667,15 @@ export const getERC20TradeList = async function (page, seq, ERC20Address) {
                     match: {
                         to: ERC20Address
                     }
-                }
-            },
-            from: (page - 1) * seq,
-            size: seq,
-            sort: [
-                { "block_number": "desc" }
-            ]
+                },
+                from: (page - 1) * seq,
+                size: seq,
+                sort: [
+                    { "block_number": "desc" }
+                ]
+            }
         })
-        let tradeList = res1.hits.hits
+        let tradeList = disposeESData(res1.hits.hits)
         let res2 = await esClient.count({
             index: "transactions",
             body: {
@@ -687,7 +687,7 @@ export const getERC20TradeList = async function (page, seq, ERC20Address) {
             }
         })
         let tradeCount = res2.count
-        return { data: { data: tradeList, count: tradeCount } }
+        return { data: tradeList, count: tradeCount }
     } catch (error) {
         console.log(error)
         return { msg: error }
@@ -706,40 +706,56 @@ export const getERC20HolderList = async function (page, seq, ERC20Address) {
             index: "wallet",
             body: {
                 query: {
-                    match: {
-                        token: ERC20Address
+                    bool: {
+                        filter: [
+                            {
+                                match: {
+                                    token: ERC20Address
+                                }
+                            },
+                            {
+                                range: {
+                                    balance: {
+                                        gt: 0
+                                    }
+                                }
+                            }
+                        ]
                     }
                 },
-                range: {
-                    balance: {
-                        gt: 0
-                    }
-                }
-            },
-            from: (page - 1) * seq,
-            size: seq,
-            sort: [
-                { "balance": "desc" }
-            ]
+                from: (page - 1) * seq,
+                size: seq,
+                sort: [
+                    { "balance": "desc" }
+                ]
+            }
         })
         let res2 = await esClient.count({
             index: "wallet",
             body: {
                 query: {
-                    match: {
-                        token: ERC20Address
-                    }
-                },
-                range: {
-                    balance: {
-                        gt: 0
+                    bool: {
+                        filter: [
+                            {
+                                match: {
+                                    token: ERC20Address
+                                }
+                            },
+                            {
+                                range: {
+                                    balance: {
+                                        gt: 0
+                                    }
+                                }
+                            }
+                        ]
                     }
                 }
             }
         })
-        let holderList = res1.hits.hits
+        let holderList = disposeESData(res1.hits.hits)
         let count = res2.count
-        return { data: { data: holderList, count: count } }
+        return { data: holderList, count: count }
     } catch (error) {
         console.log(error)
         return { msg: error }
@@ -762,8 +778,8 @@ export const getERC20Info = async function (address) {
                 }
             }
         })
-        let erc20Data = res.hits.hits
-        return { data: { info: erc20Data } }
+        let erc20Data = res.hits.hits[0]._source
+        return { info: erc20Data }
     } catch (error) {
         console.log(error)
         return { msg: error }

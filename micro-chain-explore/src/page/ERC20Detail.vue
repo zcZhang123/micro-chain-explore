@@ -242,7 +242,7 @@ import {
   getERC20DetailByAddress,
   getERC20TradeList,
   getERC20HolderList
-} from "../js/request";
+} from "../js/es_api";
 import {
   calculatePercentage,
   getTotalSupply,
