@@ -352,3 +352,65 @@ exports.deleteTransactionsByNum = async function (number) {
         return { result: false, msg: error }
     }
 }
+
+/**
+ * @description 保存/更新 每日交易数
+ */
+exports.saveTradeCurveData = async function (time, num) {
+    try {
+        let timeStr = formatTime(time)
+        // 判断该时间是否存在
+        let res1 = await esClient.search({
+            index: "trades_curve",
+            body: {
+                query: {
+                    match: {
+                        time: timeStr
+                    }
+                }
+            }
+        })
+        // 存在，更新记录
+        if (res1.hits.hits.length > 0) {
+            let count = res1.hits.hits[0]._source.count + num
+            esClient.updateByQuery({
+                index: 'trades_curve',
+                body: {
+                    query: {
+                        match: {
+                            time: timeStr
+                        }
+                    },
+                    script: {
+                        lang: "painless",
+                        source: "ctx._source.count=" + count
+                    }
+                }
+            })
+        } else { // 不存在，新建记录
+            let id = uuidv4().replace(/-/g, "");
+            await exports.createElement("trades_curve", "doc", id, { time: timeStr, count: num, timestamp: time })
+        }
+    } catch (error) {
+        logger.info("时间为：", time + ">>>>> num为：  ", num)
+        logger.error("保存/更新 每日交易数 Error,", error)
+        return { result: false, msg: error }
+    }
+}
+
+// 格式化时间戳>>> "2020-01-01"
+function formatTime(time) {
+    let unixtime = time * 1000;
+    let unixTimestamp = new Date(unixtime);
+    let Y = unixTimestamp.getFullYear();
+    let M =
+        unixTimestamp.getMonth() + 1 >= 10
+            ? unixTimestamp.getMonth() + 1
+            : '0' + (unixTimestamp.getMonth() + 1);
+    let D =
+        unixTimestamp.getDate() >= 10
+            ? unixTimestamp.getDate()
+            : '0' + unixTimestamp.getDate();
+    let toDay = Y + '-' + M + '-' + D;
+    return toDay;
+}

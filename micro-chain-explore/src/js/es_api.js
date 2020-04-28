@@ -525,8 +525,20 @@ export const getAssetListByAddress = async function (address, page, seq) {
 // 获取交易数量曲线数据 未完成
 export const getTransactionsCount = async function () {
     try {
-        let transactionsList = []
-        return { data: { data: transactionsList } }
+        let res = await esClient.search({
+            index: "trades_curve",
+            body: {
+                query: {
+                    match_all: {}
+                },
+                sort: [
+                    { timestamp: 'asc' }
+                ],
+                size: 1000
+            }
+        })
+        let transactionsList = disposeESData(res.hits.hits)
+        return { data: transactionsList }
     } catch (error) {
         console.log(error)
         return { msg: error }

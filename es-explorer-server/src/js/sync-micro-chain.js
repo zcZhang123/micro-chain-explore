@@ -4,7 +4,7 @@ const Chain3 = require("chain3")
 const chain3 = new Chain3();
 const { config } = require("../config/config")
 const { getBlockNumber, getBlock, getReceiptByHash, getTransactionByHash, isERC20, addWalletFromInput, getBalance } = require('../utils/moacUtils')
-const { getBlockNumToES, createElement, createBulkElement, getBlocksCurveByTxLength, updateBlocksCurveNum, getTransactionsCountByHash, getERC20Data, deleteBlocksByNum, deleteSomeBlocksByNum, deleteTransactionsByNum } = require('../utils/esUtils')
+const { getBlockNumToES, createElement, createBulkElement, getBlocksCurveByTxLength, updateBlocksCurveNum, getTransactionsCountByHash, getERC20Data, deleteBlocksByNum, deleteSomeBlocksByNum, deleteTransactionsByNum, saveTradeCurveData } = require('../utils/esUtils')
 
 
 exports.syncMicroChain = async function () {
@@ -130,6 +130,10 @@ exports.syncMicroChain = async function () {
           if (txInfos.length > 0) {
             // 批量保存交易数据
             await createBulkElement('transactions', 'doc', txInfos)
+            // 保存交易次数
+            let tradeTime = txInfos[0].time
+            let tradeLength = txInfos.length;
+            await saveTradeCurveData(tradeTime, tradeLength)
           }
           // 按交易数查询BlocksCurve
           let res = await getBlocksCurveByTxLength(txlength)

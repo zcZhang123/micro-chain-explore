@@ -23,8 +23,7 @@
   </section>
 </template>
 <script>
-import { getTransactionsCount } from "../js/request";
-import { getBlocksTradesCount } from "../js/es_api"
+import { getBlocksTradesCount, getTransactionsCount } from "../js/es_api"
 import { formatDate } from "../js/utils";
 export default {
   name: "TransactionCurve",
