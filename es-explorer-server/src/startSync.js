@@ -5,7 +5,6 @@ async function start () {
     while (true) {
         console.log("start sync")
         await syncMicroChain();
-        // await setTransactionsCount();
         await new Promise(resolve => setTimeout(resolve, 5000));
         console.log("one time sync end")
       }

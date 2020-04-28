@@ -125,6 +125,7 @@ exports.syncMicroChain = async function () {
               let res = await getERC20Data(token)
               let decimals = res[0]._source.decimals
               await getBalance(address, token, decimals.decimals);
+              await new Promise(resolve => setTimeout(resolve, 300));
             }
           }
           if (txInfos.length > 0) {
@@ -149,6 +150,7 @@ exports.syncMicroChain = async function () {
         // 保存区块信息
         var blockId = uuidv4().replace(/-/g, "");
         await createElement("blocks", "doc", blockId, block)
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
     }
     console.info("保存数据一次结束！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！")
