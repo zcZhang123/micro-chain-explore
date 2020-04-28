@@ -338,65 +338,100 @@ export const getHashType = async function (hash) {
  */
 export const getTradeListByAddress = async function (address, tradePartner, tradeStart, tradeEnd, page, seq) {
     try {
-        let should = [{
-            match: {
-                from: address
-            }
-        }, {
-            match: {
-                to: address
-            }
-        }]
-        if (tradePartner) {
-            should = [{
-                match: {
-                    from: address,
-                    to: tradePartner
-                }
-            }, {
-                match: {
-                    from: tradePartner,
-                    to: address
+        var bool = {
+            should: [{
+                multi_match: {
+                    query: address,
+                    fields: ["from", "to"]
                 }
             }]
         }
+        if (tradePartner) {
+            bool =
+            {
+                should: [
+                    {
+                        bool: {
+                            must: [
+                                {
+                                    match: {
+                                        from: address
+                                    }
+                                },
+                                {
+                                    match: {
+                                        to: tradePartner
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        bool: {
+                            must: [
+                                {
+                                    match: {
+                                        from: tradePartner
+                                    }
+                                },
+                                {
+                                    match: {
+                                        to: address
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
         var time = {
-            lte: ""
         }
         if (tradeStart) {
             time["gte"] = tradeStart
         }
         if (tradeEnd) {
-            time["lte"] = tradeStart
+            time["lte"] = tradeEnd
+        }
+        var body1 = {}
+        var body2 = {
+            from: (page - 1) * seq,
+            size: seq,
+            sort: [
+                { time: 'desc' }
+            ]
+        }
+        if (!tradeStart && !tradeEnd) {
+            body1 = {
+                query: {
+                    bool: bool
+                }
+            }
+        } else {
+            var filter = {
+                range: {
+                    time: time
+                }
+            }
+            body1 = {
+                query: {
+                    bool: {
+                        must: [
+                            { bool: bool }
+                        ],
+                        filter: filter
+                    }
+                }
+            }
         }
         let res1 = await esClient.search({
             index: "transactions",
-            body: {
-                query: {
-                    bool: {
-                        should: should
-                    },
-                    range: {
-                        time: time
-                    }
-                },
-                from: (page - 1) * seq,
-                size: seq
-            }
+            body: Object.assign(body2, body1)
         })
         let trade = disposeESData(res1.hits.hits)
         let res2 = await esClient.count({
             index: "transactions",
-            body: {
-                query: {
-                    bool: {
-                        should: should
-                    },
-                    range: {
-                        time: time
-                    }
-                }
-            }
+            body: body1
         })
         let count = res2.count
         return { trade: trade, count: count }
