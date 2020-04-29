@@ -14,10 +14,11 @@ exports.syncMicroChain = async function () {
     console.info("最新区块为：", blockNum)
     // 获取es保存区块
     let blockNumToDB = await getBlockNumToES()
-    // let blockNumToDB = 1
     console.info("es保存区块为：", blockNumToDB)
     // 删除es保存的最新区块
-    await deleteBlocksByNum(blockNumToDB)
+    if (blockNumToDB > 1) {
+      await deleteBlocksByNum(blockNumToDB)
+    }
     if (blockNumToDB > blockNum) {
       // 删除大于最新区块的数据
       await deleteSomeBlocksByNum(blockNum)
@@ -125,7 +126,7 @@ exports.syncMicroChain = async function () {
               let res = await getERC20Data(token)
               let decimals = res[0]._source.decimals
               await getBalance(address, token, decimals.decimals);
-              await new Promise(resolve => setTimeout(resolve, 300));
+              await new Promise(resolve => setTimeout(resolve, 260));
             }
           }
           if (txInfos.length > 0) {
@@ -150,7 +151,7 @@ exports.syncMicroChain = async function () {
         // 保存区块信息
         var blockId = uuidv4().replace(/-/g, "");
         await createElement("blocks", "doc", blockId, block)
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 260));
       }
     }
     console.info("保存数据一次结束！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！")

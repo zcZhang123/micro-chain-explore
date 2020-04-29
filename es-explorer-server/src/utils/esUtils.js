@@ -7,20 +7,32 @@ const { esClient } = require("./elisticClient")
  */
 exports.getBlockNumToES = async function () {
     try {
-        let res = await esClient.search({
+        let res1 = await esClient.search({
             index: "blocks",
             body: {
                 query: {
                     match_all: {}
-                },
-                sort: [
-                    { number: 'desc' }
-                ]
+                }
             },
             size: 1
         })
-        let blockInfo = res.hits.hits
-        return blockInfo[0]._source.number
+        let blockInfo = res1.hits.hits
+        if (blockInfo.length > 0) {
+            let res2 = await esClient.search({
+                index: "blocks",
+                body: {
+                    query: {
+                        match_all: {}
+                    },
+                    sort: [
+                        { number: 'desc' }
+                    ]
+                },
+                size: 1
+            })
+            return res2.hits.hits[0]._source.number
+        }
+        return 1
     } catch (error) {
         logger.error("获取保存最新区块号 Error,", error)
         return { result: false, msg: error }
